@@ -8,7 +8,6 @@ import java.util.Random;
 public class RandomBoardGenerator {
 
     private static final int SPLIT_BOUNDARY = 5;
-
     private Random random;
 
     public RandomBoardGenerator() {

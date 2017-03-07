@@ -1,61 +1,42 @@
 package gui;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import level.Board;
-import level.RandomBoardGenerator;
 
 public class Main extends Application {
 
-    RandomBoardGenerator generator;
-    BoardButtons mines;
-    Button generate;
-
     @Override
     public void start(Stage primaryStage) throws Exception{
+        BorderPane root = new BorderPane();
 
 
-        generator = new RandomBoardGenerator();
-        mines = new BoardButtons(generator.create(6, 6, 10, false, false));
+        MenuBar menuBar = new MenuBar();
+        Menu file = new Menu("File");
+        MenuItem newGame = new MenuItem("New");
+        MenuItem preferences = new MenuItem("Preferences");
+        MenuItem exit = new MenuItem("Exit");
+        exit.setOnAction(event -> Platform.exit());
+        file.getItems().addAll(newGame, preferences, new SeparatorMenuItem(),exit);
 
-        GridPane pane = new GridPane();
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                pane.add(mines.getButton(i, j), i, j);
-            }
-        }
-        pane.setPadding(new Insets(0,0,10,0));
+        menuBar.getMenus().add(file);
 
-        BorderPane bPane = new BorderPane();
-        bPane.setCenter(pane);
-        generate = new Button("Generate");
-        generate.setOnMouseClicked((event) -> {
-            pane.getChildren().remove(0, 36);
-            mines = new BoardButtons(generator.create(6,6, 10, false, false));
-            for (int i = 0; i < 6; i++) {
-                for (int j = 0; j < 6; j++) {
-                    pane.add(mines.getButton(i, j), i, j);
-                }
-            }
+
+        root.setTop(menuBar);
+
+        BorderPane canvas = new BorderPane();
+        canvas.setCenter(new TextArea("ffasdfsdfasdf"));
+
+        Scene scene = new Scene(root);
+        scene.setOnKeyPressed((event) -> {
+            if (event.getCode() == KeyCode.ESCAPE) Platform.exit();
         });
-        bPane.setBottom(generate);
-        bPane.setPadding(new Insets(5,5,5,5));
-        bPane.setAlignment(generate, Pos.CENTER);
-        bPane.setAlignment(pane, Pos.CENTER);;
-
-        BorderPane ghost = new BorderPane();
-        ghost.setCenter(bPane);
-        ghost.setPadding(new Insets(5,5,5,5));
-        ghost.setAlignment(bPane, Pos.CENTER);
-
-        Scene scene = new Scene(ghost);
 
         primaryStage.setTitle("Minesweeper");
         primaryStage.setScene(scene);
