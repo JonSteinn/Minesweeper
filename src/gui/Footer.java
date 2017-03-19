@@ -20,6 +20,7 @@ public class Footer extends VBox {
         this.timer = new Timer();
         this.bombsLeft = new BombCounter(10);
         this.play = new Button("Start");
+        this.play.setOnAction(event -> Controller.controller.playAsComputer());
         this.status = new Label("Idle");
 
         HBox upper = new HBox();

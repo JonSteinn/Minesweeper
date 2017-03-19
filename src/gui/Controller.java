@@ -1,5 +1,6 @@
 package gui;
 
+import agent.RandomAgent;
 import javafx.application.Platform;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -24,6 +25,7 @@ public class Controller {
     private Footer footer;
     private Stage stage;
     private int clicksToWin;
+    private RandomAgent agent;
 
     private Controller() {
         this.player = Player.HUMAN;
@@ -41,6 +43,8 @@ public class Controller {
         this.boardButtons = new BoardButtons(this.board);
         this.root.setCenter(this.boardButtons);
         this.root.setBottom(this.footer);
+        this.footer.getPlay().setDisable(true);
+        this.agent = null;
     }
 
     public void exit() {
@@ -77,6 +81,7 @@ public class Controller {
     public void setPlayer(Player player) {
         this.player = player;
         newGame();
+        if (player == Player.Computer) this.agent = new RandomAgent();
     }
 
     public void setDifficulty(Difficulty difficulty) {
@@ -124,6 +129,13 @@ public class Controller {
                 this.footer.setStatus(this.state);
                 this.footer.getTimer().stopPlayClock();
             }
+        }
+    }
+
+    public void playAsComputer() {
+        while (this.state != GameState.LOST && this.state != GameState.WON) {
+            int[] next = this.agent.nextMove(this.board.getWidth(), this.board.getHeight());
+            this.boardButtons.get(next[0], next[1]).fire();
         }
     }
 
