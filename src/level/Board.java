@@ -39,11 +39,12 @@ public class Board {
         if (!board[y][x]) bombCount++;
         board[y][x] = true;
     }
+
     public int adjacentBombs(int x, int y) {
         int counter = 0;
         for (int i = x-1; i < x+2; i++) {
             for (int j = y-1; j < y+2; j++) {
-                if ((i != 0 || j != 0) && !outOfBounds(i, j) && containsBomb(i,j)) {
+                if (!outOfBounds(i, j) && containsBomb(i,j)) {
                     counter++;
                 }
             }
