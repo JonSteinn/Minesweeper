@@ -47,10 +47,13 @@ public class Timer extends Label {
         }
     }
 
-    public void startPlayClock() {
+    public void restartPlayClock() {
         this.seconds = 0;
         this.minutes = 0;
         this.setText(timeString());
+    }
+
+    public void startPlayClock() {
         this.timeEvent.playFromStart();
     }
 

@@ -17,9 +17,7 @@ public class MinesweeperButton extends Button {
         this.clicked = false;
         this.setOnAction(event -> Controller.controller.buttonUpdate(this, this.x, this.y));
         this.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if (event.getButton() == MouseButton.SECONDARY && !clicked) {
-                setText(getText().equals("#") ? "" : "#");
-            }
+            if (event.getButton() == MouseButton.SECONDARY && !clicked) Controller.controller.markBomb(this);
         });
         this.setMaxWidth(30);
         this.setMinWidth(30);

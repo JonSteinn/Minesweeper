@@ -11,6 +11,7 @@ public class Main extends Application {
         Scene scene = new Scene(Controller.controller.getRoot());
         scene.setOnKeyPressed((event) -> {
             if (event.getCode() == KeyCode.ESCAPE) Controller.controller.exit();
+            if (event.getCode() == KeyCode.F1) Controller.controller.newGame();
         });
         Controller.controller.setStage(primaryStage);
         primaryStage.setTitle("Minesweeper");

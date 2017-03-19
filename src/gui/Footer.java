@@ -12,13 +12,13 @@ import javafx.scene.layout.VBox;
 public class Footer extends VBox {
 
     private Timer timer;
-    private Label bombsLeft;
+    private BombCounter bombsLeft;
     private Button play;
     private Label status;
 
     public Footer() {
         this.timer = new Timer();
-        this.bombsLeft = new Label("10");
+        this.bombsLeft = new BombCounter(10);
         this.play = new Button("Start");
         this.status = new Label("Idle");
 
@@ -39,7 +39,7 @@ public class Footer extends VBox {
         return this.timer;
     }
 
-    public Label getBombsLeft() {
+    public BombCounter getBombsLeft() {
         return this.bombsLeft;
     }
 
@@ -47,7 +47,7 @@ public class Footer extends VBox {
         return this.play;
     }
 
-    public Label getStatus() {
-        return this.status;
+    public void setStatus(GameState state) {
+        this.status.setText(state.toString());
     }
 }
