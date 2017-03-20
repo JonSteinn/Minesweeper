@@ -81,7 +81,7 @@ public class Controller {
     public void setPlayer(Player player) {
         this.player = player;
         newGame();
-        if (player == Player.Computer) this.agent = new RandomAgent();
+        if (player == Player.Computer) this.agent = new RandomAgent(); // new CSPAgent();
     }
 
     public void setDifficulty(Difficulty difficulty) {

@@ -57,7 +57,11 @@ public class Board {
         StringBuffer str = new StringBuffer();
         for (int j = 0; j < getHeight(); j++) {
             for (int i = 0; i < getWidth(); i++) {
-                str.append(containsBomb(i, j) ? '1' : '0');
+                if (containsBomb(i, j)) str.append('X');
+                else {
+                    int adj = this.adjacentBombs(i, j);
+                    str.append(adj == 0 ? "." : adj);
+                }
             }
             str.append('\n');
         }
