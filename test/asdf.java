@@ -1,3 +1,5 @@
+import csp.MSConstraint;
+import csp.MSVariable;
 import level.Board;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
@@ -11,6 +13,11 @@ public class asdf {
     @Test
     public void foo() {
 
+        System.out.println(MSVariable.fromString("(123,532)"));
+        System.out.println(new MSConstraint(5, new MSVariable(1,1), new MSVariable(2,3)));
+
+
+        if (true) return;
         Board b = new Board(5,5);
         b.addBomb(0,0);
         b.addBomb(3,3);
