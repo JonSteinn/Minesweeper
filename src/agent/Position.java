@@ -1,13 +1,13 @@
-package csp;
+package agent;
 
 /**
  * Created by Jonni on 3/20/2017.
  */
-public class MSVariable {
+public class Position {
 
-    public static MSVariable fromString(String str) {
+    public static Position fromString(String str) {
         String[] numbers = str.split(",");
-        return new MSVariable(
+        return new Position(
                 Integer.parseInt(numbers[0].substring(1, numbers[0].length())),
                 Integer.parseInt(numbers[1].substring(0, numbers[1].length() - 1))
         );
@@ -16,7 +16,7 @@ public class MSVariable {
     private int x;
     private int y;
 
-    public MSVariable(int x, int y) {
+    public Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -36,7 +36,7 @@ public class MSVariable {
 
     @Override
     public boolean equals(Object o) {
-        MSVariable other = (MSVariable)o;
+        Position other = (Position)o;
         return this.x == other.x && this.y == other.y;
     }
 
