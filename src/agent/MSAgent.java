@@ -1,8 +1,6 @@
 package agent;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Jonni on 3/20/2017.
@@ -10,7 +8,7 @@ import java.util.Random;
 public class MSAgent {
 
     Random generator;
-    Queue<Position> pendingMoves;
+    Set<Position> pendingMoves;
     PositionGrid grid;
     PerspectiveBoard board;
     int width;
@@ -23,7 +21,7 @@ public class MSAgent {
 
     public void init(int width, int height, int bombs) {
         generator = new Random();
-        pendingMoves = new LinkedList<>();
+        pendingMoves = new HashSet<>();
         board = new PerspectiveBoard(width, height);
         grid = new PositionGrid(width, height);
         firstMove();
@@ -34,7 +32,10 @@ public class MSAgent {
 
     public Position nextMove() {
         if (pendingMoves.isEmpty()) findMove();
-        return pendingMoves.poll();
+        Iterator<Position> it = pendingMoves.iterator();
+        Position pos = it.next();
+        it.remove();
+        return pos;
     }
 
     private void firstMove() { // TODO: is there something better to do?

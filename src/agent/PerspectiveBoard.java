@@ -35,7 +35,7 @@ public class PerspectiveBoard {
         }
     }
 
-    public void setAdjacent(int x, int y, int adjacent, PositionGrid grid, Queue<Position> moves) {
+    public void setAdjacent(int x, int y, int adjacent, PositionGrid grid, Set<Position> moves) {
         board[x][y] = (byte)adjacent;
         Set<Position> neighbours = new HashSet<>();
         for (Position position : grid.getNeighbours(x,y)) {
