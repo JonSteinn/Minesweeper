@@ -15,32 +15,31 @@ import java.util.Set;
  */
 public class MSModel {
 
-    public Model model;
-    public Map<Position, Integer> indexMap;
-    public IntVar[] vars;
+    private Model model;
+    private Map<Position, Integer> indexMap;
+    private IntVar[] vars;
 
     public MSModel(Set<ConstraintInfo> info, Set<Position> variables) throws ContradictionException {
-        model = new Model();
-        indexMap = new HashMap<>();
-        vars = new IntVar[variables.size()];
+        this.model = new Model();
+        this.indexMap = new HashMap<>();
+        this.vars = new IntVar[variables.size()];
 
         int index = 0;
         for (Position pos : variables) {
-            vars[index] = model.intVar(pos.toString(), 0, 1);
-            indexMap.put(pos, index);
+            this.vars[index] = this.model.intVar(pos.toString(), 0, 1);
+            this.indexMap.put(pos, index);
             index++;
         }
         for (ConstraintInfo c : info) {
             IntVar[] con = new IntVar[c.getUnknownNeighbours().size()];
             index = 0;
             for (Position pos : c.getUnknownNeighbours()) {
-                con[index] = vars[indexMap.get(pos)];
+                con[index] = this.vars[this.indexMap.get(pos)];
                 index++;
             }
-            model.sum(con, "=", c.getAdjacentBombs()).post();
+            this.model.sum(con, "=", c.getAdjacentBombs()).post();
         }
-
-        model.getSolver().propagate();
+        this.model.getSolver().propagate();
     }
 
 
@@ -55,20 +54,10 @@ public class MSModel {
     private boolean containsContradiction(Constraint constraint) {
         model.getEnvironment().worldPush();
         model.post(constraint);
-
-        try {
-            model.getSolver().propagate();
-            Solution sol = model.getSolver().findSolution();
-            model.getSolver().hardReset();
-            model.getEnvironment().worldPop();
-            model.unpost(constraint);
-            return sol == null;
-        } catch (ContradictionException e) {
-            model.getSolver().getEngine().flush();
-            model.getSolver().hardReset();
-            model.getEnvironment().worldPop();
-            model.unpost(constraint);
-            return true;
-        }
-}
+        Solution sol = model.getSolver().findSolution();
+        model.getEnvironment().worldPop();
+        model.unpost(constraint);
+        model.getSolver().hardReset();
+        return sol == null;
+    }
 }

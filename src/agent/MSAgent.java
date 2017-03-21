@@ -9,6 +9,7 @@ import java.util.*;
  */
 public class MSAgent {
 
+    public Set<Position> history;
     public Random generator;
     public Set<Position> pendingMoves;
     public PositionGrid grid;
@@ -22,6 +23,7 @@ public class MSAgent {
     }
 
     public void init(int width, int height, int bombs) {
+        history = new HashSet<>();
         generator = new Random();
         pendingMoves = new HashSet<>();
         board = new PerspectiveBoard(width, height);
@@ -33,11 +35,32 @@ public class MSAgent {
     }
 
     public Position nextMove() {
-        if (pendingMoves.isEmpty()) findMove();
-        Iterator<Position> it = pendingMoves.iterator();
-        Position pos = it.next();
-        it.remove();
-        return pos;
+        Position next = null;
+        while (!pendingMoves.isEmpty()) {
+            Iterator<Position> it = pendingMoves.iterator();
+            Position pos = it.next();
+            it.remove();
+            if (!history.contains(pos)) {
+                next = pos;
+                history.add(pos);
+                break;
+            }
+        }
+        if (next == null) {
+            findMove();
+            if (pendingMoves.isEmpty()) {
+                next = randomMove();
+            } else {
+                Iterator<Position> it = pendingMoves.iterator();
+                next = it.next();
+                it.remove();
+            }
+        }
+        return next;
+    }
+
+    public Position randomMove() { // TODO
+        return null;
     }
 
     public void sendBackResult(Position position, int adjacent) {
@@ -56,7 +79,7 @@ public class MSAgent {
         boolean found = false;
         Stack<Position> bombs = new Stack<>();
         ConstraintGroups cGroups = new ConstraintGroups(this.board);
-        for (Map.Entry<Set<ConstraintInfo>, Set<Position>> entry : cGroups.groups.entrySet()) {
+        for (Map.Entry<Set<ConstraintInfo>, Set<Position>> entry : cGroups.getGroups().entrySet()) {
             try {
                 MSModel model = new MSModel(entry.getKey(), entry.getValue());
                 for (Position position : entry.getValue()) {
