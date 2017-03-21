@@ -8,6 +8,12 @@ import java.util.Set;
 /**
  * Created by Jonni on 3/20/2017.
  */
+
+/* *****************************************************
+ * TODO: BUG: removes from collection in mid-iteration *
+ ***************************************************** */
+
+
 public class PerspectiveBoard {
 
     public static final byte UNKNOWN = -1;

@@ -55,12 +55,19 @@ public class MSAgent {
                 next = it.next();
                 it.remove();
             }
+            history.add(next);
         }
         return next;
     }
 
-    public Position randomMove() { // TODO
-        return null;
+    public Position randomMove() {
+        ArrayList<Position> list = new ArrayList<>();
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (this.board.getBoard()[i][j] == PerspectiveBoard.UNKNOWN) list.add(this.grid.getVariable(i, j));
+            }
+        }
+        return list.get(this.generator.nextInt(list.size()));
     }
 
     public void sendBackResult(Position position, int adjacent) {
@@ -102,6 +109,6 @@ public class MSAgent {
     }
 
     private void guess() {
-        // TODO
+        this.pendingMoves.add(randomMove()); // TODO
     }
 }

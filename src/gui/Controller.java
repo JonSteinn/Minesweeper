@@ -1,5 +1,7 @@
 package gui;
 
+import agent.MSAgent;
+import agent.Position;
 import agent.RandomAgent;
 import javafx.application.Platform;
 import javafx.scene.layout.Background;
@@ -25,7 +27,7 @@ public class Controller {
     private Footer footer;
     private Stage stage;
     private int clicksToWin;
-    private RandomAgent agent;
+    private MSAgent agent;
 
     private Controller() {
         this.player = Player.HUMAN;
@@ -58,16 +60,19 @@ public class Controller {
                 this.board = this.boardGenerator.create(8, 8, 10, false, false);
                 this.footer.getBombsLeft().setAmountLeft(10);
                 this.clicksToWin = 8 * 8 - 10;
+                if (this.player == Player.Computer) this.agent = new MSAgent(8,8,10);
                 break;
             case MEDIUM:
                 this.board = this.boardGenerator.create(16, 16, 40, false, false);
                 this.footer.getBombsLeft().setAmountLeft(40);
                 this.clicksToWin = 16 * 16 - 40;
+                if (this.player == Player.Computer) this.agent = new MSAgent(16,16,40);
                 break;
             case HARD:
                 this.board = this.boardGenerator.create(24, 24, 99, false, false);
                 this.footer.getBombsLeft().setAmountLeft(99);
                 this.clicksToWin = 24 * 24 - 99;
+                if (this.player == Player.Computer) this.agent = new MSAgent(24,24,99);
         }
         this.footer.getTimer().restartPlayClock();
         this.footer.setStatus(this.state);
@@ -81,7 +86,6 @@ public class Controller {
     public void setPlayer(Player player) {
         this.player = player;
         newGame();
-        if (player == Player.Computer) this.agent = new RandomAgent(); // new CSPAgent();
     }
 
     public void setDifficulty(Difficulty difficulty) {
@@ -133,9 +137,37 @@ public class Controller {
     }
 
     public void playAsComputer() {
+        this.state = GameState.PLAYING;
+        this.footer.setStatus(this.state);
+        this.footer.getTimer().startPlayClock();
         while (this.state != GameState.LOST && this.state != GameState.WON) {
-            int[] next = this.agent.nextMove(this.board.getWidth(), this.board.getHeight());
-            this.boardButtons.get(next[0], next[1]).fire();
+            Position pos = this.agent.nextMove();
+            this.agent.sendBackResult(pos, computerClick(pos.getX(), pos.getY()));
+        }
+    }
+
+    private int computerClick(int x, int y) {
+        MinesweeperButton button = this.boardButtons.get(x, y);
+        button.click();
+
+        if (this.board.containsBomb(x,y)) {
+            button.setText("X");
+            button.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
+            this.state = GameState.LOST;
+            this.footer.setStatus(this.state);
+            this.footer.getTimer().stopPlayClock();
+            return -1;
+        } else {
+            this.clicksToWin--;
+            int adj = this.board.adjacentBombs(x, y);
+            if (adj != 0) button.setText(Integer.toString(adj));
+            button.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
+            if (clicksToWin == 0) {
+                this.state = GameState.WON;
+                this.footer.setStatus(this.state);
+                this.footer.getTimer().stopPlayClock();
+            }
+            return adj;
         }
     }
 
