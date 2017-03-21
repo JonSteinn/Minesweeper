@@ -14,9 +14,9 @@ import java.util.Set;
  */
 public class MSModel {
 
-    Model model;
-    Map<Position, Integer> indexMap;
-    IntVar[] vars;
+    public Model model;
+    public Map<Position, Integer> indexMap;
+    public IntVar[] vars;
 
     public MSModel(Set<ConstraintInfo> info, Set<Position> variables) throws ContradictionException {
         model = new Model();

@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Created by Jonni on 3/20/2017.
  */
 public class PositionGrid {
-    private Position[][] board;
+    public Position[][] board;
 
     public PositionGrid(int width, int height) {
         this.board = new Position[width][height];
