@@ -73,7 +73,7 @@ public class MSAgent {
         boolean searchAgain = (!found && !bombs.isEmpty());
         while (!bombs.isEmpty()) {
             Position position = bombs.pop();
-            this.board.setBombAt(position.getX(), position.getY(), this.grid);
+            this.board.setBombAt(position.getX(), position.getY(), this.grid, this.pendingMoves);
         }
         return searchAgain ? search() : found;
     }

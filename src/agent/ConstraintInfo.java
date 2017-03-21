@@ -6,12 +6,41 @@ import java.util.Set;
  * Created by Jonni on 3/20/2017.
  */
 public class ConstraintInfo {
-    public Set<Position> unknownNeighbours;
-    public int adjacentBombs;
+
+    private Set<Position> unknownNeighbours;
+    private int adjacentBombs;
 
     public ConstraintInfo(Set<Position> unknownNeighbours, int adjacentBombs) {
         this.unknownNeighbours = unknownNeighbours;
         this.adjacentBombs = adjacentBombs;
+    }
+
+    public int getAdjacentBombs() {
+        return this.adjacentBombs;
+    }
+
+    public void decrementAdjacentBombs() {
+        this.adjacentBombs--;
+    }
+
+    public Set<Position> getUnknownNeighbours() {
+        return this.unknownNeighbours;
+    }
+
+    public void removeVariable(Position position) {
+        this.unknownNeighbours.remove(position);
+    }
+
+    public boolean allBombs() {
+        return this.adjacentBombs == unknownNeighbours.size();
+    }
+
+    public boolean noBombs() {
+        return this.adjacentBombs == 0;
+    }
+
+    public boolean isEmpty() {
+        return this.unknownNeighbours.isEmpty();
     }
 
     @Override

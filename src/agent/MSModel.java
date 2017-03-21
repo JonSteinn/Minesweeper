@@ -1,6 +1,7 @@
 package agent;
 
 import org.chocosolver.solver.Model;
+import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.exception.ContradictionException;
 import org.chocosolver.solver.variables.IntVar;
@@ -30,13 +31,13 @@ public class MSModel {
             index++;
         }
         for (ConstraintInfo c : info) {
-            IntVar[] con = new IntVar[c.unknownNeighbours.size()];
+            IntVar[] con = new IntVar[c.getUnknownNeighbours().size()];
             index = 0;
-            for (Position pos : c.unknownNeighbours) {
+            for (Position pos : c.getUnknownNeighbours()) {
                 con[index] = vars[indexMap.get(pos)];
                 index++;
             }
-            model.sum(con, "=", c.adjacentBombs);
+            model.sum(con, "=", c.getAdjacentBombs()).post();
         }
 
         model.getSolver().propagate();
@@ -53,17 +54,21 @@ public class MSModel {
 
     private boolean containsContradiction(Constraint constraint) {
         model.getEnvironment().worldPush();
-        constraint.post();
+        model.post(constraint);
 
         try {
             model.getSolver().propagate();
-            return model.getSolver().findSolution() == null;
-        } catch (ContradictionException e) {
-            model.getSolver().getEngine().flush();
-            return true;
-        } finally {
+            Solution sol = model.getSolver().findSolution();
+            model.getSolver().hardReset();
             model.getEnvironment().worldPop();
             model.unpost(constraint);
+            return sol == null;
+        } catch (ContradictionException e) {
+            model.getSolver().getEngine().flush();
+            model.getSolver().hardReset();
+            model.getEnvironment().worldPop();
+            model.unpost(constraint);
+            return true;
         }
-    }
+}
 }

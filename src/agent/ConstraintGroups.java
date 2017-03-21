@@ -10,13 +10,13 @@ public class ConstraintGroups {
 
     public ConstraintGroups(PerspectiveBoard board) {
         this.groups = new HashMap<>();
-        for (ConstraintInfo info : board.constraintPositions.values()) add(info);
+        for (ConstraintInfo info : board.getConstraintPositions().values()) add(info);
     }
 
     public void add(ConstraintInfo info) {
         Stack<Set<ConstraintInfo>> toMerge = new Stack<>();
         for (Map.Entry<Set<ConstraintInfo>, Set<Position>> entry : groups.entrySet()) {
-            for (Position variable : info.unknownNeighbours) {
+            for (Position variable : info.getUnknownNeighbours()) {
                 if (entry.getValue().contains(variable)) {
                     toMerge.push(entry.getKey());
                     break;
@@ -26,7 +26,7 @@ public class ConstraintGroups {
         if (toMerge.isEmpty()) {
             Set<ConstraintInfo> newSet = new HashSet<>();
             newSet.add(info);
-            groups.put(newSet, info.unknownNeighbours);
+            groups.put(newSet, info.getUnknownNeighbours());
         } else {
             merge(toMerge, info);
         }
@@ -42,7 +42,7 @@ public class ConstraintGroups {
             groups.remove(temp);
         }
         keySet.add(info);
-        valueSet.addAll(info.unknownNeighbours);
+        valueSet.addAll(info.getUnknownNeighbours());
         groups.put(keySet, valueSet);
         // TODO: simplify when adding new (a1+a2+a_3+a_4 = 2 should become a_3 + a_4 = 1 if a_1+a_2=1 is added)
     }

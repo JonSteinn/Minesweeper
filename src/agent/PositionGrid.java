@@ -1,20 +1,19 @@
 package agent;
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 /**
  * Created by Jonni on 3/20/2017.
  */
 public class PositionGrid {
-    public Position[][] board;
+    private Position[][] board;
 
     public PositionGrid(int width, int height) {
-        this.board = new Position[width][height];
-        for (int j = 0; j < width; j++) {
-            for (int i = 0; i < height; i++) {
-                this.board[i][j] = new Position(i,j);
-            }
-        }
+        this.board = IntStream.range(0, width).mapToObj(x ->
+                IntStream.range(0, height).mapToObj(y ->
+                        new Position(x, y)).toArray(Position[]::new)
+        ).toArray(Position[][]::new);
     }
 
     public Position getVariable(int x, int y) {
