@@ -1,11 +1,10 @@
 package agent;
 
+import level.Board;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -269,5 +268,67 @@ public class PerspectiveBoardTest {
         ###11
         ###1x
          */
+    }
+
+    @Test
+    public void foo() {
+        /*
+        ........
+        .1221...
+        .1XX2232
+        .1222XXX
+        11..13X4
+        X1...13X
+        221...2X
+        1X1...11
+
+        (4,0)
+        (5,0)
+        (6,0)
+        (7,0)
+        (7,1)
+        (6,1)
+        (7,2)
+        (5,1)
+        (6,2)
+         */
+        Board board = new Board(8, 8);
+        board.addBomb(2,2);
+        board.addBomb(3,2);
+        board.addBomb(5,3);
+        board.addBomb(6,3);
+        board.addBomb(7,3);
+        board.addBomb(6,4);
+        board.addBomb(0,5);
+        board.addBomb(7,5);
+        board.addBomb(7,6);
+        board.addBomb(1,7);
+
+        Set<Position> pending = new HashSet<>();
+        PositionGrid grid = new PositionGrid(8, 8);
+
+        PerspectiveBoard pBoard = new PerspectiveBoard(8, 8);
+        String[] tmp = new String[]{"(4,0)", "(5,0)", "(6,0)", "(7,0)", "(7,1)", "(6,1)", "(7,2)", "(5,1)", "(6,2)"};
+        Queue<Position> q = new LinkedList<>();
+        for (String t : tmp) q.add(Position.fromString(t));
+        while (q.size() > 1) {
+            Position next = q.poll();
+            pBoard.setAdjacent(next.getX(), next.getY(), board.adjacentBombs(next.getX(), next.getY()), grid, pending);
+        }
+
+
+        pBoard.setAdjacent(6,2,3,grid,pending);
+
+        System.out.println(pending);
+        p(pBoard.getBoard());
+    }
+
+    void p(byte[][] b) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                System.out.print(b[j][i]+ " ");
+            }
+            System.out.println();
+        }
     }
 }

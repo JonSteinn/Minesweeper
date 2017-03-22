@@ -1,9 +1,6 @@
 package agent;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Jonni on 3/20/2017.
