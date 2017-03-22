@@ -50,16 +50,15 @@ public class MSAgent {
             findMove();
             if (pendingMoves.isEmpty()) {
                 next = randomMove();
-                System.out.println("RANDOM");
+                //System.out.println("RANDOM");
             } else {
-                System.out.println("LOGIC");
                 Iterator<Position> it = pendingMoves.iterator();
                 next = it.next();
                 it.remove();
             }
             history.add(next);
         } else {
-            System.out.println("STORED");
+            //System.out.println("STORED");
         }
         return next;
     }
@@ -83,7 +82,12 @@ public class MSAgent {
     }
 
     private void findMove() {
-        if (!search()) guess();
+        if (!search()) {
+            //System.out.println("RANDOM");
+            guess();
+        } else {
+            //System.out.println("LOGIC");
+        }
     }
 
     private boolean search() {

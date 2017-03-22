@@ -1,5 +1,7 @@
 package agent;
 
+import level.Board;
+
 import java.util.*;
 
 /**
@@ -7,11 +9,14 @@ import java.util.*;
  */
 
 /* *****************************************************
- * TODO: BUG: removes from collection in mid-iteration *
+ * TODO: BUG: occasionally adds bombs to pending *
  ***************************************************** */
 
 
 public class PerspectiveBoard {
+
+    // FOR DEBUGGING: TODO: REMOVE
+    public static Board b = null;
 
     public static final byte UNKNOWN = -1;
     public static final byte BOMB = 10;
@@ -64,7 +69,7 @@ public class PerspectiveBoard {
         }
         if (neighbours.size() == adjacent) {
             for (Position position : neighbours) {
-                setBombAt(position.getX(), position.getY(), grid, moves);
+                containsBombSet.add(position);
             }
         }
         else if (adjacent == 0) moves.addAll(neighbours);
@@ -104,24 +109,4 @@ public class PerspectiveBoard {
             this.removeSet.add(position);
         }
     }
-
-    /*
-    private void simplify(ConstraintInfo info, Position position, Set<Position> moves, PositionGrid grid) {
-        if (info.isEmpty()) this.constraintPositions.remove(position);
-        else if (info.noBombs()) {
-            moves.addAll(info.getUnknownNeighbours()); // 2x check
-            this.constraintPositions.remove(position);
-        }
-        else if (info.allBombs()) {
-            for (Position pos : info.getUnknownNeighbours()) {
-                setBombAt(pos.getX(), pos.getY(), grid, moves); // 2x check
-            }
-            this.constraintPositions.remove(position);
-        }
-    }*/
 }
-
-/*
-#x#
-###
- */
