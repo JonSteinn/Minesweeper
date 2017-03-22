@@ -16,25 +16,20 @@ import java.util.Set;
 public class MSModel {
 
     private Model model;
-    private Map<Position, Integer> indexMap;
-    private IntVar[] vars;
+    private Map<Position, IntVar> varMap;
 
     public MSModel(Set<ConstraintInfo> info, Set<Position> variables) throws ContradictionException {
         this.model = new Model();
-        this.indexMap = new HashMap<>();
-        this.vars = new IntVar[variables.size()];
+        this.varMap = new HashMap<>();
 
-        int index = 0;
         for (Position pos : variables) {
-            this.vars[index] = this.model.intVar(pos.toString(), 0, 1);
-            this.indexMap.put(pos, index);
-            index++;
+            this.varMap.put(pos, this.model.intVar(pos.toString(), 0, 1));
         }
         for (ConstraintInfo c : info) {
             IntVar[] con = new IntVar[c.getUnknownNeighbours().size()];
-            index = 0;
+            int index = 0;
             for (Position pos : c.getUnknownNeighbours()) {
-                con[index] = this.vars[this.indexMap.get(pos)];
+                con[index] = this.varMap.get(pos);
                 index++;
             }
             this.model.sum(con, "=", c.getAdjacentBombs()).post();
@@ -44,11 +39,11 @@ public class MSModel {
 
 
     public boolean hasBomb(Position p) {
-        return containsContradiction(model.arithm(vars[indexMap.get(p)], "=", 0));
+        return containsContradiction(model.arithm(varMap.get(p), "=", 0));
     }
 
     public boolean hasNoBombs(Position p) {
-        return containsContradiction(model.arithm(vars[indexMap.get(p)], "=", 1));
+        return containsContradiction(model.arithm(varMap.get(p), "=", 1));
     }
 
     private boolean containsContradiction(Constraint constraint) {

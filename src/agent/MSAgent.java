@@ -124,8 +124,35 @@ public class MSAgent {
     }
 
     private void guess() {
+        Set<Position> variables = new HashSet<>();
         Map<Position, Double> probabilities = new HashMap<>();
         ConstraintGroups cGroups = new ConstraintGroups(this.board);
+        int bombsOutsideVariables = this.bombs;
+        for (Map.Entry<Set<ConstraintInfo>, Set<Position>> entry : cGroups.getGroups().entrySet()) {
+            try {
+                ProbabilityModel pModel = new ProbabilityModel(entry.getKey(), entry.getValue(), variables);
+                bombsOutsideVariables -= pModel.getProbabilities(probabilities);
+            } catch (ContradictionException e) {
+                System.out.println("Something wrong with the csp model!");
+            }
+        }
+        PriorityQueue<Map.Entry<Position, Double>> pq = new PriorityQueue<>(Comparator.comparingDouble(Map.Entry::getValue));
+        for (Map.Entry<Position, Double> entry : probabilities.entrySet()) {
+            pq.add(entry);
+        }
+
+        ArrayList<Position> unknownNonVariables = getUnknownNonVariables(variables);
+        if (pq.isEmpty()) {
+            this.pendingMoves.add(unknownNonVariables.get(this.generator.nextInt(unknownNonVariables.size())));
+        } else if (unknownNonVariables.isEmpty()) {
+            this.pendingMoves.add(pq.poll().getKey());
+        } else {
+            Map.Entry<Position, Double> pair = pq.poll();
+            double probabilityOfUnknowns = (100.0 * bombsOutsideVariables) / unknownNonVariables.size();
+            this.pendingMoves.add(probabilityOfUnknowns < pair.getValue() ?
+                    unknownNonVariables.get(this.generator.nextInt(unknownNonVariables.size())) : pair.getKey()
+            );
+        }
     }
 
     private Position nextBomb() {
