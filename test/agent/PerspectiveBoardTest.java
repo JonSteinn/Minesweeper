@@ -271,7 +271,7 @@ public class PerspectiveBoardTest {
     }
 
     @Test
-    public void foo() {
+    public void bug() {
         /*
         ........
         .1221...
@@ -321,6 +321,7 @@ public class PerspectiveBoardTest {
 
         System.out.println(pending);
         p(pBoard.getBoard());
+        System.out.println(pBoard.getConstraintPositions());
     }
 
     void p(byte[][] b) {

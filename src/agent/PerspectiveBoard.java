@@ -19,7 +19,12 @@ public class PerspectiveBoard {
     private Map<Position, ConstraintInfo> constraintPositions;
     private byte[][] board;
 
+    private Set<Position> containsBombSet;
+    private Set<Position> removeSet;
+
     public PerspectiveBoard(int width, int height) {
+        this.containsBombSet = new HashSet<>();
+        this.removeSet = new HashSet<>();
         this.constraintPositions = new HashMap<>();
         board = new byte[width][height];
         for (int i = 0; i < width; i++) {
@@ -36,7 +41,7 @@ public class PerspectiveBoard {
             if ((info = constraintPositions.get(position)) != null) {
                 info.decrementAdjacentBombs();
                 info.removeVariable(grid.getVariable(x, y));
-                simplify(info, position, moves, grid);
+                storeSimplifications(info, position, moves);
             }
         }
     }
@@ -53,7 +58,7 @@ public class PerspectiveBoard {
                 ConstraintInfo info;
                 if ((info = constraintPositions.get(position)) != null) {
                     info.removeVariable(grid.getVariable(x, y));
-                    simplify(info, position, moves, grid);
+                    storeSimplifications(info, position, moves);
                 }
             }
         }
@@ -64,6 +69,8 @@ public class PerspectiveBoard {
         }
         else if (adjacent == 0) moves.addAll(neighbours);
         else this.constraintPositions.put(grid.getVariable(x, y), new ConstraintInfo(neighbours, adjacent));
+
+        emptyTempSets(grid, moves);
     }
 
     public Map<Position, ConstraintInfo> getConstraintPositions() {
@@ -74,6 +81,31 @@ public class PerspectiveBoard {
         return this.board;
     }
 
+    private void emptyTempSets(PositionGrid grid, Set<Position> moves) {
+        while (!containsBombSet.isEmpty()) {
+            Iterator<Position> it = containsBombSet.iterator();
+            Position bomb = it.next();
+            it.remove();
+            setBombAt(bomb.getX(), bomb.getY(), grid, moves);
+        }
+        for (Position pos : this.removeSet) {
+            this.constraintPositions.remove(pos);
+        }
+    }
+
+    private void storeSimplifications(ConstraintInfo info, Position position, Set<Position> moves) {
+        if (info.isEmpty()) {
+            this.removeSet.add(position);
+        } else if (info.noBombs()) {
+            moves.addAll(info.getUnknownNeighbours());
+            this.removeSet.add(position);
+        } else if (info.allBombs()) {
+            for (Position pos : info.getUnknownNeighbours()) this.containsBombSet.add(pos);
+            this.removeSet.add(position);
+        }
+    }
+
+    /*
     private void simplify(ConstraintInfo info, Position position, Set<Position> moves, PositionGrid grid) {
         if (info.isEmpty()) this.constraintPositions.remove(position);
         else if (info.noBombs()) {
@@ -86,5 +118,10 @@ public class PerspectiveBoard {
             }
             this.constraintPositions.remove(position);
         }
-    }
+    }*/
 }
+
+/*
+#x#
+###
+ */

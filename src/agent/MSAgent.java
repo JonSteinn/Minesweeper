@@ -50,12 +50,16 @@ public class MSAgent {
             findMove();
             if (pendingMoves.isEmpty()) {
                 next = randomMove();
+                System.out.println("RANDOM");
             } else {
+                System.out.println("LOGIC");
                 Iterator<Position> it = pendingMoves.iterator();
                 next = it.next();
                 it.remove();
             }
             history.add(next);
+        } else {
+            System.out.println("STORED");
         }
         return next;
     }
