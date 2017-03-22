@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.sun.xml.internal.ws.dump.LoggingDumpTube.Position.Before;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -69,8 +70,8 @@ public class ConstraintGroupsTest {
 
     @Test
     public void empty() {
-        this.board.setAdjacent(5, 5, 0, this.grid, new HashSet<>());
-        this.board.setBombAt(3,3, this.grid, new HashSet<>());
+        this.board.setAdjacent(5, 5, 0, this.grid, new HashSet<>(), new HashSet<>());
+        this.board.setBombAt(3,3, this.grid, new HashSet<>(), new HashSet<>());
         assertTrue(new ConstraintGroups(this.board).isEmpty());
     }
 

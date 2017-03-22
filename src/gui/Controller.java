@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 import level.Board;
 import level.RandomBoardGenerator;
 
+import java.util.Set;
+
 public class Controller {
 
     public static Controller controller = new Controller();
@@ -141,6 +143,13 @@ public class Controller {
         this.footer.setStatus(this.state);
         this.footer.getTimer().startPlayClock();
         while (this.state != GameState.LOST && this.state != GameState.WON) {
+
+            Position bomb;
+            while ((bomb = this.agent.markBomb()) != null) {
+                this.boardButtons.get(bomb.getX(), bomb.getY()).setText("#");
+                this.footer.getBombsLeft().decrementBombsLeft();
+            }
+
             Position pos = this.agent.nextMove();
             this.agent.sendBackResult(pos, computerClick(pos.getX(), pos.getY()));
         }

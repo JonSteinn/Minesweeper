@@ -26,6 +26,7 @@ public class RandomBoardGenerator {
                 );
     }
 
+
     private Board create(int width, int height, int bombs) {
         Board board = new Board(width, height);
         while (board.getBombCount() < bombs) {
@@ -100,10 +101,6 @@ public class RandomBoardGenerator {
         }
     }
 
-    private int intervalRandom(int a, int b) {
-        return this.random.nextInt(b-a+1)+a;
-    }
-
     private boolean surrounded(Board board, int x, int y) {
         for (int i = x - 1; i < x + 2; i++) {
             for (int j = y - 1; j < y + 2; j++) {
@@ -113,5 +110,9 @@ public class RandomBoardGenerator {
             }
         }
         return true;
+    }
+
+    private int intervalRandom(int a, int b) {
+        return this.random.nextInt(b-a+1)+a;
     }
 }

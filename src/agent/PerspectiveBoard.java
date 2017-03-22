@@ -39,8 +39,9 @@ public class PerspectiveBoard {
         }
     }
 
-    public void setBombAt(int x, int y, PositionGrid grid, Set<Position> moves) {
+    public void setBombAt(int x, int y, PositionGrid grid, Set<Position> moves, Set<Position> bombs) {
         board[x][y] = BOMB;
+        bombs.add(grid.getVariable(x,y));
         for (Position position : grid.getNeighbours(x,y)) {
             ConstraintInfo info;
             if ((info = constraintPositions.get(position)) != null) {
@@ -51,7 +52,7 @@ public class PerspectiveBoard {
         }
     }
 
-    public void setAdjacent(int x, int y, int adjacent, PositionGrid grid, Set<Position> moves) {
+    public void setAdjacent(int x, int y, int adjacent, PositionGrid grid, Set<Position> moves, Set<Position> bombs) {
         board[x][y] = (byte)adjacent;
         Set<Position> neighbours = new HashSet<>();
         for (Position position : grid.getNeighbours(x,y)) {
@@ -75,7 +76,7 @@ public class PerspectiveBoard {
         else if (adjacent == 0) moves.addAll(neighbours);
         else this.constraintPositions.put(grid.getVariable(x, y), new ConstraintInfo(neighbours, adjacent));
 
-        emptyTempSets(grid, moves);
+        emptyTempSets(grid, moves, bombs);
     }
 
     public Map<Position, ConstraintInfo> getConstraintPositions() {
@@ -86,12 +87,14 @@ public class PerspectiveBoard {
         return this.board;
     }
 
-    private void emptyTempSets(PositionGrid grid, Set<Position> moves) {
+    private void emptyTempSets(PositionGrid grid, Set<Position> moves, Set<Position> bombs) {
         while (!containsBombSet.isEmpty()) {
             Iterator<Position> it = containsBombSet.iterator();
             Position bomb = it.next();
             it.remove();
-            setBombAt(bomb.getX(), bomb.getY(), grid, moves);
+            if (this.board[bomb.getX()][bomb.getY()] != PerspectiveBoard.BOMB) {
+                setBombAt(bomb.getX(), bomb.getY(), grid, moves, bombs);
+            }
         }
         for (Position pos : this.removeSet) {
             this.constraintPositions.remove(pos);

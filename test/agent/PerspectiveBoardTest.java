@@ -34,7 +34,7 @@ public class PerspectiveBoardTest {
     @Test
     public void clickZeroAtFirstTest() {
         Set<Position> pendingMoves = new HashSet<>();
-        this.pBoard.setAdjacent(2,3,0, this.grid, pendingMoves);
+        this.pBoard.setAdjacent(2,3,0, this.grid, pendingMoves, new HashSet<>());
         assertTrue(this.pBoard.getConstraintPositions().isEmpty());
         assertEquals(8, pendingMoves.size());
         assertEquals(0, this.pBoard.getBoard()[2][3]);
@@ -56,7 +56,7 @@ public class PerspectiveBoardTest {
         #####
         #####
          */
-        this.pBoard.setAdjacent(1,0, 1, this.grid, pendingMoves);
+        this.pBoard.setAdjacent(1,0, 1, this.grid, pendingMoves, new HashSet<>());
         Set<Position> expectedVariables1 = new HashSet<>();
         expectedVariables1.addAll(Arrays.asList(
                 this.grid.getVariable(0,0),
@@ -76,7 +76,7 @@ public class PerspectiveBoardTest {
         #####
         #####
          */
-        this.pBoard.setAdjacent(0,1, 1, this.grid, pendingMoves);
+        this.pBoard.setAdjacent(0,1, 1, this.grid, pendingMoves, new HashSet<>());
         Set<Position> expectedVariables2 = new HashSet<>();
         expectedVariables2.addAll(Arrays.asList(
                 this.grid.getVariable(0,0),
@@ -98,7 +98,7 @@ public class PerspectiveBoardTest {
         #####
         #####
          */
-        this.pBoard.setAdjacent(1,1, 1, this.grid, pendingMoves);
+        this.pBoard.setAdjacent(1,1, 1, this.grid, pendingMoves, new HashSet<>());
         Set<Position> expectedVariables3 = new HashSet<>();
         expectedVariables3.addAll(Arrays.asList(
                 this.grid.getVariable(2,0),
@@ -125,7 +125,7 @@ public class PerspectiveBoardTest {
         #####
         #####
          */
-        this.pBoard.setAdjacent(2,0, 0, this.grid, pendingMoves);
+        this.pBoard.setAdjacent(2,0, 0, this.grid, pendingMoves, new HashSet<>());
         assertFalse(pendingMoves.isEmpty());
         assertEquals(3, pendingMoves.size());
         assertTrue(pendingMoves.containsAll(Arrays.asList(this.grid.getVariable(3,0), this.grid.getVariable(3,1), this.grid.getVariable(2,1))));
@@ -147,7 +147,7 @@ public class PerspectiveBoardTest {
         #####
         #####
          */
-        this.pBoard.setAdjacent(2, 1, 0, this.grid, pendingMoves);
+        this.pBoard.setAdjacent(2, 1, 0, this.grid, pendingMoves, new HashSet<>());
         assertEquals(7, pendingMoves.size());
         assertTrue(pendingMoves.containsAll(Arrays.asList(
                 this.grid.getVariable(3,0),
@@ -178,7 +178,7 @@ public class PerspectiveBoardTest {
         #####
          */
         Set<Position> pendingMoves = new HashSet<>();
-        this.pBoard.setAdjacent(2,2, 8, this.grid, pendingMoves);
+        this.pBoard.setAdjacent(2,2, 8, this.grid, pendingMoves, new HashSet<>());
         assertTrue(pendingMoves.isEmpty());
         assertTrue(this.pBoard.getConstraintPositions().isEmpty());
 
@@ -209,12 +209,12 @@ public class PerspectiveBoardTest {
     @Test
     public void nextToBombTest() {
         Set<Position> pendingMoves = new HashSet<>();
-        this.pBoard.setBombAt(1,1, this.grid, pendingMoves);
-        this.pBoard.setBombAt(3,3, this.grid, pendingMoves);
+        this.pBoard.setBombAt(1,1, this.grid, pendingMoves, new HashSet<>());
+        this.pBoard.setBombAt(3,3, this.grid, pendingMoves, new HashSet<>());
         assertTrue(pendingMoves.isEmpty());
         assertTrue(this.pBoard.getConstraintPositions().isEmpty());
 
-        this.pBoard.setAdjacent(2,2,3, this.grid, pendingMoves);
+        this.pBoard.setAdjacent(2,2,3, this.grid, pendingMoves, new HashSet<>());
         assertEquals(1, this.pBoard.getConstraintPositions().size());
         assertTrue(pendingMoves.isEmpty());
         assertFalse(this.pBoard
@@ -243,20 +243,20 @@ public class PerspectiveBoardTest {
     public void gameTest1() {
         Set<Position> pending = new HashSet<>();
         for (int i = 0; i < 5; i++) {
-            this.pBoard.setAdjacent(i,2, 0, this.grid, pending);
-            if (i != 2) this.pBoard.setAdjacent(2,i, 0, this.grid, pending);
+            this.pBoard.setAdjacent(i,2, 0, this.grid, pending, new HashSet<>());
+            if (i != 2) this.pBoard.setAdjacent(2,i, 0, this.grid, pending, new HashSet<>());
         }
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 if ((i == 0 && j == 0) || (i == 4 && j == 4)) assertFalse(pending.contains(this.grid.getVariable(i,j)));
             }
         }
-        this.pBoard.setAdjacent(1,1,1,this.grid,pending);
-        this.pBoard.setAdjacent(0,1,1,this.grid,pending);
-        this.pBoard.setAdjacent(1,0,1,this.grid,pending);
-        this.pBoard.setAdjacent(4,3,1,this.grid,pending);
-        this.pBoard.setAdjacent(3,3,1,this.grid,pending);
-        this.pBoard.setAdjacent(3,4,1,this.grid,pending);
+        this.pBoard.setAdjacent(1,1,1,this.grid,pending, new HashSet<>());
+        this.pBoard.setAdjacent(0,1,1,this.grid,pending, new HashSet<>());
+        this.pBoard.setAdjacent(1,0,1,this.grid,pending, new HashSet<>());
+        this.pBoard.setAdjacent(4,3,1,this.grid,pending, new HashSet<>());
+        this.pBoard.setAdjacent(3,3,1,this.grid,pending, new HashSet<>());
+        this.pBoard.setAdjacent(3,4,1,this.grid,pending, new HashSet<>());
         assertTrue(this.pBoard.getConstraintPositions().isEmpty());
         assertEquals(10, this.pBoard.getBoard()[0][0]);
         assertEquals(10, this.pBoard.getBoard()[4][4]);
@@ -271,7 +271,7 @@ public class PerspectiveBoardTest {
     }
 
     @Test
-    public void bug() {
+    public void gameTest2() {
         /*
         ........
         .1221...
@@ -311,17 +311,65 @@ public class PerspectiveBoardTest {
         String[] tmp = new String[]{"(4,0)", "(5,0)", "(6,0)", "(7,0)", "(7,1)", "(6,1)", "(7,2)", "(5,1)", "(6,2)"};
         Queue<Position> q = new LinkedList<>();
         for (String t : tmp) q.add(Position.fromString(t));
-        while (q.size() > 1) {
+        while (!q.isEmpty()) {
             Position next = q.poll();
-            pBoard.setAdjacent(next.getX(), next.getY(), board.adjacentBombs(next.getX(), next.getY()), grid, pending);
+            pBoard.setAdjacent(next.getX(), next.getY(), board.adjacentBombs(next.getX(), next.getY()), grid, pending, new HashSet<>());
         }
 
+        /*
+        expected:
 
-        pBoard.setAdjacent(6,2,3,grid,pending);
+        X = unknown
+        B = bomb
+        P = pending
 
-        System.out.println(pending);
-        p(pBoard.getBoard());
-        System.out.println(pBoard.getConstraintPositions());
+        XXXP0000
+        XXXPP000
+        XXXXPP32
+        XXXXXXBB
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+
+        2 only has bombs so that should be removed and the bombs marked
+        The only remaining constraint is (5,2)+(5+3) = 1, since we already moved 2 bombs from the constraint
+         */
+
+        assertTrue(pending.contains(grid.getVariable(3,0)));
+        assertTrue(pending.contains(grid.getVariable(3,1)));
+        assertTrue(pending.contains(grid.getVariable(4,1)));
+        assertTrue(pending.contains(grid.getVariable(4,2)));
+        assertTrue(pending.contains(grid.getVariable(5,2)));
+
+        assertFalse(pending.contains(grid.getVariable(7,3)));
+        assertFalse(pending.contains(grid.getVariable(6,3)));
+        assertFalse(pending.contains(grid.getVariable(5,3)));
+
+        assertEquals(PerspectiveBoard.BOMB, pBoard.getBoard()[7][3]);
+        assertEquals(PerspectiveBoard.BOMB, pBoard.getBoard()[6][3]);
+
+        assertEquals(2, pBoard.getBoard()[7][2]);
+        assertEquals(3, pBoard.getBoard()[6][2]);
+
+        int counterZero = 0;
+        int counterUnknown = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (pBoard.getBoard()[i][j] == PerspectiveBoard.UNKNOWN) counterUnknown++;
+                if (pBoard.getBoard()[i][j] == 0) counterZero++;
+            }
+        }
+        assertEquals(4 * 8 + 6 + 6 + 5 + 4, counterUnknown);
+        assertEquals(7, counterZero);
+
+        assertEquals(1, pBoard.getConstraintPositions().size());
+        assertEquals(grid.getVariable(6,2), pBoard.getConstraintPositions().entrySet().iterator().next().getKey());
+        ConstraintInfo i = pBoard.getConstraintPositions().entrySet().iterator().next().getValue();
+        Set<Position> expectedVars = new HashSet<>();
+        expectedVars.addAll(Arrays.asList(grid.getVariable(5,2), grid.getVariable(5,3)));
+        assertEquals(expectedVars, i.getUnknownNeighbours());
+        assertEquals(1, i.getAdjacentBombs());
     }
 
     void p(byte[][] b) {
