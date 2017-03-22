@@ -20,17 +20,6 @@ public class MSAgentTest {
 
     @Test
     public void foo() {
-        Model m = new Model();
-        IntVar i = m.intVar("a", 0,1);
-        IntVar j = m.intVar("b", 0,1);
-        System.out.println(i.hashCode());
-        System.out.println(j.hashCode());
-        m.post(m.sum(new IntVar[]{i,j}, "=", 1));
-        for (Solution sol : m.getSolver().findAllSolutions()) {
-            System.out.println(sol.getIntVal(i));
-            System.out.println(sol.getIntVal(j));
-        }
-        System.out.println(m.getSolver().getSolutionCount());
 
 
     }

@@ -1,22 +1,13 @@
 package agent;
 
-import level.Board;
-
 import java.util.*;
 
 /**
  * Created by Jonni on 3/20/2017.
  */
 
-/* *****************************************************
- * TODO: BUG: occasionally adds bombs to pending *
- ***************************************************** */
-
 
 public class PerspectiveBoard {
-
-    // FOR DEBUGGING: TODO: REMOVE
-    public static Board b = null;
 
     public static final byte UNKNOWN = -1;
     public static final byte BOMB = 10;

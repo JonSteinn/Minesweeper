@@ -8,6 +8,8 @@ import javafx.scene.layout.VBox;
 
 /**
  * Created by Jonni on 3/19/2017.
+ *
+ * Bottom part of the GUI.
  */
 public class Footer extends VBox {
 
@@ -16,6 +18,9 @@ public class Footer extends VBox {
     private Button play;
     private Label status;
 
+    /**
+     * Constructor. Sets up event handling.
+     */
     public Footer() {
         this.timer = new Timer();
         this.bombsLeft = new BombCounter(10);
@@ -36,18 +41,30 @@ public class Footer extends VBox {
         this.getChildren().addAll(upper, lower);
     }
 
+    /**
+     * @return Timer label
+     */
     public Timer getTimer() {
         return this.timer;
     }
 
+    /**
+     * @return BombCounter label
+     */
     public BombCounter getBombsLeft() {
         return this.bombsLeft;
     }
 
+    /**
+     * @return computer play button
+     */
     public Button getPlay() {
         return this.play;
     }
 
+    /**
+     * @param state label for state
+     */
     public void setStatus(GameState state) {
         this.status.setText(state.toString());
     }

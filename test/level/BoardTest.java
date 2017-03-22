@@ -56,17 +56,4 @@ public class BoardTest {
         this.board.addBomb(5,2);
         assertTrue("When contains", this.board.containsBomb(5,2));
     }
-
-    @Test
-    public void equalsTest() {
-        Board another = new Board(this.board.getWidth(), this.board.getHeight());
-        int toAdd = (this.board.getWidth() * this.board.getHeight()) >> 4;
-        while (toAdd-- > 0) {
-            int x = this.random.nextInt(this.board.getWidth());
-            int y = this.random.nextInt(this.board.getHeight());
-            this.board.addBomb(x, y);
-            another.addBomb(x, y);
-        }
-        assertTrue(this.board.equals(another));
-    }
 }

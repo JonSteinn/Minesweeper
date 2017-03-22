@@ -5,9 +5,18 @@ import level.Board;
 
 /**
  * Created by jonsteinn on 6.3.2017.
+ *
+ * Data structure for buttons as well as a layout unit for them.
  */
 public class BoardButtons extends GridPane {
-    MinesweeperButton[][] access;
+
+    private MinesweeperButton[][] access;
+
+    /**
+     * Constructor. Creates buttons for a given board.
+     *
+     * @param board minesweeper board.
+     */
     public BoardButtons(Board board) {
         this.access = new MinesweeperButton[board.getWidth()][board.getHeight()];
         for (int i = 0; i < board.getWidth(); i++) {
@@ -18,6 +27,14 @@ public class BoardButtons extends GridPane {
             }
         }
     }
+
+    /**
+     * Getter for data structure.
+     *
+     * @param x coordinate
+     * @param y coordinate
+     * @return A button at (x,y).
+     */
     public MinesweeperButton get(int x, int y) {
         return this.access[x][y];
     }

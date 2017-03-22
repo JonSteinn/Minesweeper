@@ -7,12 +7,17 @@ import javafx.util.Duration;
 
 /**
  * Created by Jonni on 3/19/2017.
+ *
+ * Time display.
  */
 public class Timer extends Label {
     private int seconds;
     private int minutes;
     private Timeline timeEvent;
 
+    /**
+     * Constructor, sets time at 0 and creates event.
+     */
     public Timer() {
         this.setText("00:00");
         this.timeEvent = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
@@ -22,15 +27,21 @@ public class Timer extends Label {
         this.timeEvent.setCycleCount(Timeline.INDEFINITE);
     }
 
+    /**
+     * Increases time by one second.
+     */
     private void addSecond() {
         this.seconds++;
         if (this.seconds == 60) {
             this.seconds = 0;
             this.minutes++;
         }
-        // TODO: fails if > hour
+        // TODO: handle +60 min
     }
 
+    /**
+     * @return formatted string for time.
+     */
     private String timeString() {
         if (seconds < 10) {
             if (minutes < 10) {
@@ -47,19 +58,26 @@ public class Timer extends Label {
         }
     }
 
+    /**
+     * Restarts time but does not stop.
+     */
     public void restartPlayClock() {
         this.seconds = 0;
         this.minutes = 0;
         this.setText(timeString());
     }
 
+    /**
+     * Starts time.
+     */
     public void startPlayClock() {
         this.timeEvent.playFromStart();
     }
 
+    /**
+     * Stops time.
+     */
     public void stopPlayClock() {
         this.timeEvent.stop();
     }
-
-
 }

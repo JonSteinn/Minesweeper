@@ -4,11 +4,16 @@ import javafx.scene.control.*;
 
 /**
  * Created by Jonni on 3/6/2017.
+ *
+ * Top bar of the GUI.
  */
 public class MinesweeperMenu extends MenuBar {
 
     private Menu size, playAs;
 
+    /**
+     * Constructor that sets up all events.
+     */
     public MinesweeperMenu() {
         Menu file, preferences;
         MenuItem newGame, exit;
@@ -58,6 +63,10 @@ public class MinesweeperMenu extends MenuBar {
         exit.setOnAction((event) -> Controller.controller.exit());
     }
 
+    /**
+     * Disables settings.
+     * @param enable true to disable, false to enable
+     */
     public void setPreferences(boolean enable) {
         this.size.setDisable(enable);
         this.playAs.setDisable(enable);

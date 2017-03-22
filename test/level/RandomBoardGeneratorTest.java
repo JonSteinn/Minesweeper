@@ -35,21 +35,23 @@ public class RandomBoardGeneratorTest {
 
     @Test
     public void noSurroundedTest() {
-        Board board = generator.create(8, 8, 32, true, false);
-        int bombCount = 0;
-        boolean noSurrounded = true;
-        for (int i = 0; i < board.getWidth(); i++) {
-            for (int j = 0; j < board.getHeight(); j++) {
-                if (board.containsBomb(i, j)) {
-                    bombCount++;
-                    if (noSurrounded) {
-                        noSurrounded = notSurrounded(board, i, j);
+        for (int k = 0; k < 100; k++) {
+            Board board = generator.create(8, 8, 32, true, false);
+            int bombCount = 0;
+            boolean noSurrounded = true;
+            for (int i = 0; i < board.getWidth(); i++) {
+                for (int j = 0; j < board.getHeight(); j++) {
+                    if (board.containsBomb(i, j)) {
+                        bombCount++;
+                        if (noSurrounded) {
+                            noSurrounded = notSurrounded(board, i, j);
+                        }
                     }
                 }
             }
+            assertEquals("Bomb count", 32, bombCount);
+            assertTrue("No bomb surrounded by bombs", noSurrounded);
         }
-        assertEquals("Bomb count", 32, bombCount);
-        assertTrue("No bomb surrounded by bombs", noSurrounded);
     }
 
     @Test

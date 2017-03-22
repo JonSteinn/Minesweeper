@@ -2,7 +2,6 @@ package gui;
 
 import agent.MSAgent;
 import agent.Position;
-import agent.RandomAgent;
 import javafx.application.Platform;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -12,10 +11,14 @@ import javafx.stage.Stage;
 import level.Board;
 import level.RandomBoardGenerator;
 
-import java.util.Set;
-
+/**
+ * The event handler and brain for the entire GUI.
+ */
 public class Controller {
 
+    /**
+     * Constructor is private and only this single instance can be used.
+     */
     public static Controller controller = new Controller();
 
     private Player player = Player.HUMAN;
@@ -31,6 +34,9 @@ public class Controller {
     private int clicksToWin;
     private MSAgent agent;
 
+    /**
+     * Constructor. Initially, a human playing 8x8 game is created.
+     */
     private Controller() {
         this.player = Player.HUMAN;
         this.difficulty = Difficulty.EASY;
@@ -51,10 +57,16 @@ public class Controller {
         this.agent = null;
     }
 
+    /**
+     * Quit program.
+     */
     public void exit() {
         Platform.exit();
     }
 
+    /**
+     * Create a new game.
+     */
     public void newGame() {
         this.state = GameState.IDLE;
         switch (difficulty) {
@@ -85,22 +97,42 @@ public class Controller {
         this.resizeStage();
     }
 
+    /**
+     * Changes player
+     *
+     * @param player Player enum
+     */
     public void setPlayer(Player player) {
         this.player = player;
         newGame();
     }
 
+    /**
+     * Changes difficulty.
+     *
+     * @param difficulty Difficulty enum
+     */
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
         newGame();
     }
 
+    /**
+     * @return UI root.
+     */
     public BorderPane getRoot() {
         return this.root;
     }
 
+    /**
+     * Open square as a human player.
+     *
+     * @param button Button to click
+     * @param x coordinate
+     * @param y coordinate
+     */
     public void buttonUpdate(MinesweeperButton button, int x, int y) {
-        if (this.state == GameState.LOST || this.state == GameState.WON || button.isDown() || button.getText().equals("#")) return;
+        if (this.player == Player.Computer || this.state == GameState.LOST || this.state == GameState.WON || button.isDown() || button.getText().equals("#")) return;
         if (this.state == GameState.IDLE) {
             this.state = GameState.PLAYING;
             this.footer.setStatus(this.state);
@@ -118,6 +150,7 @@ public class Controller {
             this.clicksToWin--;
             int adj = this.board.adjacentBombs(x, y);
             if (adj == 0) {
+                // Recursive auto update for 0-squares
                 if (!board.outOfBounds(x - 1, y - 1)) this.boardButtons.get(x - 1, y - 1).fire();
                 if (!board.outOfBounds(x, y - 1)) this.boardButtons.get(x, y - 1).fire();
                 if (!board.outOfBounds(x + 1, y - 1)) this.boardButtons.get(x + 1, y - 1).fire();
@@ -138,35 +171,48 @@ public class Controller {
         }
     }
 
+    /**
+     * Run solver.
+     */
     public void playAsComputer() {
+        newGame();
         this.state = GameState.PLAYING;
         this.footer.setStatus(this.state);
         this.footer.getTimer().startPlayClock();
         while (this.state != GameState.LOST && this.state != GameState.WON) {
-
+            // Mark all bombs the agent knows of that have not already been marked.
             Position bomb;
             while ((bomb = this.agent.markBomb()) != null) {
                 this.boardButtons.get(bomb.getX(), bomb.getY()).setText("#");
                 this.footer.getBombsLeft().decrementBombsLeft();
             }
-
+            // Get next move from agent.
             Position pos = this.agent.nextMove();
             this.agent.sendBackResult(pos, computerClick(pos.getX(), pos.getY()));
         }
     }
 
+    /**
+     * Click for computer. Not a UI event.
+     *
+     * @param x
+     * @param y
+     * @return
+     */
     private int computerClick(int x, int y) {
         MinesweeperButton button = this.boardButtons.get(x, y);
         button.click();
-
         if (this.board.containsBomb(x,y)) {
+            // If lost, we just return any number since they game won't continue.
             button.setText("X");
             button.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
             this.state = GameState.LOST;
             this.footer.setStatus(this.state);
             this.footer.getTimer().stopPlayClock();
-            return -1;
+            return 0;
         } else {
+            // If the square does not contain a bomb, we return the number it contains.
+            // This is the only communication with the agent.
             this.clicksToWin--;
             int adj = this.board.adjacentBombs(x, y);
             if (adj != 0) button.setText(Integer.toString(adj));
@@ -180,8 +226,13 @@ public class Controller {
         }
     }
 
+    /**
+     * Mark square as bombs for human player.
+     *
+     * @param button Button to mark
+     */
     public void markBomb(MinesweeperButton button) {
-        if (this.state == GameState.LOST || this.state == GameState.WON) return;
+        if (this.player == Player.Computer || this.state == GameState.LOST || this.state == GameState.WON) return;
         if (button.getText().equals("#")) {
             button.setText("");
             this.footer.getBombsLeft().incrementBombsLeft();
@@ -191,10 +242,16 @@ public class Controller {
         }
     }
 
+    /**
+     * @param stage Stage
+     */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
+    /**
+     * Resizing for level changing.
+     */
     public void resizeStage() {
         this.stage.sizeToScene();
     }
