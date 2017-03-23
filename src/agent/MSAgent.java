@@ -95,7 +95,7 @@ public class MSAgent {
         // If not, search for one
         if (next == null) {
             findMove();
-            next = this.pendingMoves.isEmpty() ? randomMove() : nextPending();
+            next = nextPending();
             this.history.add(next);
         }
 
@@ -245,14 +245,25 @@ public class MSAgent {
         if (pq.isEmpty()) {
             this.pendingMoves.add(unknownNonVariables.get(this.generator.nextInt(unknownNonVariables.size())));
         } else if (unknownNonVariables.isEmpty()) {
-            this.pendingMoves.add(pq.poll().getKey());
+            this.pendingMoves.add(randomLowestProbability(pq));
         } else {
-            Map.Entry<Position, Double> pair = pq.poll();
             double probabilityOfUnknowns = (100.0 * bombsOutsideVariables) / unknownNonVariables.size();
-            this.pendingMoves.add(probabilityOfUnknowns < pair.getValue() ?
-                    unknownNonVariables.get(this.generator.nextInt(unknownNonVariables.size())) : pair.getKey()
-            );
+            if (probabilityOfUnknowns < pq.peek().getValue()) {
+                this.pendingMoves.add(unknownNonVariables.get(this.generator.nextInt(unknownNonVariables.size())));
+            } else {
+                this.pendingMoves.add(randomLowestProbability(pq));
+            }
         }
+    }
+
+    private Position randomLowestProbability(PriorityQueue<Map.Entry<Position, Double>> sortedProbabilities) {
+        ArrayList<Map.Entry<Position, Double>> lowProb = new ArrayList<>();
+        lowProb.add(sortedProbabilities.poll());
+        double prob = lowProb.get(0).getValue();
+        while (!sortedProbabilities.isEmpty() && sortedProbabilities.peek().getValue() == prob) {
+            lowProb.add(sortedProbabilities.poll());
+        }
+        return lowProb.get(this.generator.nextInt(lowProb.size())).getKey();
     }
 
     /**
@@ -277,19 +288,6 @@ public class MSAgent {
         Position pos = it.next();
         it.remove();
         return pos;
-    }
-
-    /**
-     * @return random move from any unknown position
-     */
-    private Position randomMove() {
-        ArrayList<Position> list = new ArrayList<>();
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                if (this.board.getBoard()[i][j] == PerspectiveBoard.UNKNOWN) list.add(this.grid.getVariable(i, j));
-            }
-        }
-        return list.get(this.generator.nextInt(list.size()));
     }
 
     /**
