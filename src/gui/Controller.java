@@ -94,7 +94,6 @@ public class Controller {
         else footer.getPlay().setDisable(false);
         this.boardButtons = new BoardButtons(this.board);
         this.root.setCenter(this.boardButtons);
-        this.resizeStage();
     }
 
     /**
@@ -115,6 +114,7 @@ public class Controller {
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
         newGame();
+        this.resizeStage();
     }
 
     /**
@@ -175,6 +175,7 @@ public class Controller {
      * Run solver.
      */
     public void playAsComputer() {
+        if (this.player == Player.HUMAN) return;
         newGame();
         this.state = GameState.PLAYING;
         this.footer.setStatus(this.state);
@@ -189,6 +190,13 @@ public class Controller {
             // Get next move from agent.
             Position pos = this.agent.nextMove();
             this.agent.sendBackResult(pos, computerClick(pos.getX(), pos.getY()));
+        }
+        if (this.state == GameState.WON) {
+            Position bomb;
+            while ((bomb = this.agent.markBomb()) != null) {
+                this.boardButtons.get(bomb.getX(), bomb.getY()).setText("#");
+                this.footer.getBombsLeft().decrementBombsLeft();
+            }
         }
     }
 
@@ -254,6 +262,9 @@ public class Controller {
      */
     public void resizeStage() {
         this.stage.sizeToScene();
+        this.stage.centerOnScreen();
+        this.stage.setWidth(this.stage.getWidth() + 10);
+        this.stage.setHeight(this.stage.getHeight() + 10);
     }
 
 }

@@ -11,6 +11,8 @@ import java.util.*;
  */
 public class MSAgent {
 
+    private static final int END_GAME_MARK = 15;
+
     /* Temporary storage */
     private Set<Position> markedBombs;
     private Set<Position> unmarkedBombs;
@@ -24,9 +26,9 @@ public class MSAgent {
     private int width;
     private int height;
     private int bombs;
-    private int nonBombs;
-
-    // TODO: switch to end-game mode at some point
+    private int initialBombCount;
+    private int movesRemainingToWin;
+    private boolean endgame;
 
     /**
      * Constructor for an agent with a random first move.
@@ -80,6 +82,8 @@ public class MSAgent {
      * @return the next move from the agent.
      */
     public Position nextMove() {
+        //stateCheck();
+
         Position next = null;
 
         // Are there any moves bending?
@@ -99,7 +103,7 @@ public class MSAgent {
             this.history.add(next);
         }
 
-        this.nonBombs--;
+        this.movesRemainingToWin--;
         return next;
     }
 
@@ -120,6 +124,7 @@ public class MSAgent {
                 this.pendingMoves,
                 this.unmarkedBombs
         );
+
     }
 
     /**
@@ -140,7 +145,9 @@ public class MSAgent {
         this.width = width;
         this.height = height;
         this.bombs = bombs;
-        this.nonBombs = width * height - bombs;
+        this.initialBombCount = bombs;
+        this.endgame = false;
+        this.movesRemainingToWin = this.width * this.height - this.bombs;
     }
 
     /**
@@ -159,7 +166,43 @@ public class MSAgent {
      * Search moves if non pending.
      */
     private void findMove() {
-        if (!search()) guess();
+        if (!search()) {
+            if (this.movesRemainingToWin <= MSAgent.END_GAME_MARK) {
+                this.endgame = true;
+            }
+            if (this.endgame) {
+                if (endGameSearch()) {
+                    return;
+                }
+            }
+            guess();
+        }
+    }
+
+    private boolean endGameSearch() {
+        boolean found = false;
+        Stack<Position> bombs = new Stack<>();
+
+        EndGameConstraint constraints = new EndGameConstraint(this.board, this.initialBombCount, this.width, this.height, this.grid);
+        try {
+            MSModel model = new MSModel(constraints);
+            for (Position pos : constraints.getVariables()) {
+                if (model.hasBomb(pos)) bombs.add(pos);
+                else if (model.hasNoBombs(pos)) {
+                    found = true;
+                    this.pendingMoves.add(pos);
+                }
+            }
+        } catch (ContradictionException ex) {
+            System.out.println("something wrong with model! debug!");
+        }
+
+        boolean searchAgain = !found && !bombs.isEmpty();
+        while (!bombs.isEmpty()) {
+            Position position = bombs.pop();
+            this.board.manualSetBombAt(position.getX(), position.getY(), this.grid, this.pendingMoves, this.unmarkedBombs);
+        }
+        return searchAgain ? endGameSearch() : found;
     }
 
     /**
@@ -195,7 +238,7 @@ public class MSAgent {
             MSModel model = new MSModel(entry.getKey(), entry.getValue());
             for (Position position : entry.getValue()) {
                 if (model.hasNoBombs(position)) {
-                    pendingMoves.add(position);
+                    this.pendingMoves.add(position);
                     found = true;
                 }
                 else if (model.hasBomb(position)) bombs.add(position);

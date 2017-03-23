@@ -50,6 +50,42 @@ public class MSModel {
     }
 
     /**
+     * Constructor that adds end game constraint, sum of all unknowns = remaining bombs
+     *
+     * @param constraint endgame constraint
+     * @throws ContradictionException should never happen
+     */
+    public MSModel(EndGameConstraint constraint) throws ContradictionException {
+        this.model = new Model();
+        this.varMap = new HashMap<>();
+
+        // Map each variable to a Choco variable
+        for (Position pos : constraint.getVariables()) this.varMap.put(pos, this.model.intVar(pos.toString(), 0, 1));
+
+        // Create Choco constraints from our constraints
+        for (ConstraintInfo c : constraint.getConstraints()) {
+            IntVar[] con = new IntVar[c.getUnknownNeighbours().size()];
+            int index = 0;
+            for (Position pos : c.getUnknownNeighbours()) {
+                con[index] = this.varMap.get(pos);
+                index++;
+            }
+            this.model.sum(con, "=", c.getAdjacentBombs()).post();
+        }
+
+        IntVar[] con = new IntVar[constraint.getVariables().size()];
+        int index = 0;
+        for (Position pos : constraint.getVariables()) {
+            con[index] = varMap.get(pos);
+            index++;
+        }
+        this.model.sum(con, "=", constraint.getBombsRemaining());
+
+        // constraint propagation
+        this.model.getSolver().propagate();
+    }
+
+    /**
      * Assume that a position does not contain a bomb, check if it
      * leads to a contradiction. If so, it must contain a bomb.
      *

@@ -1,5 +1,7 @@
 package gui;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import level.Board;
 
@@ -18,6 +20,8 @@ public class BoardButtons extends GridPane {
      * @param board minesweeper board.
      */
     public BoardButtons(Board board) {
+        setPadding(new Insets(5, 5, 5, 5));
+        this.setAlignment(Pos.CENTER);
         this.access = new MinesweeperButton[board.getWidth()][board.getHeight()];
         for (int i = 0; i < board.getWidth(); i++) {
             for (int j = 0; j < board.getHeight(); j++) {

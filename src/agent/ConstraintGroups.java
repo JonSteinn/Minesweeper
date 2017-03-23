@@ -89,11 +89,5 @@ public class ConstraintGroups {
         keySet.add(info);
         valueSet.addAll(info.getUnknownNeighbours());
         groups.put(keySet, valueSet);
-        // TODO:
-        /* This can be done even better.
-         * If one constraint is a+b+c+d = 2 and another a+c=1
-         * we have a+b+c+d = 1+b+d = 2 => b+d = 1
-         * which results in the constraints b+d=1^a+c=1
-         */
     }
 }

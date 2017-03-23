@@ -168,13 +168,12 @@ public class MSAgentTest {
             }
         }
         start.add(this.grid.getVariable(7,7));
-        start.add(this.grid.getVariable(6,6));
         start.add(this.grid.getVariable(6,7));
-        start.add(this.grid.getVariable(7,6));
 
 
-        for (int experiment = 0; experiment < 15; experiment++) {
-            MSAgent agent = new MSAgent(8, 8, 3, start.get(random.nextInt(start.size())));
+        for (int experiment = 0; experiment < 1500; experiment++) {
+            Position pos = start.get(random.nextInt(start.size()));
+            MSAgent agent = new MSAgent(8, 8, 3, pos);
 
             int movesToWin = 8 * 8 - 3;
             boolean won = true;
@@ -189,6 +188,7 @@ public class MSAgentTest {
                 agent.sendBackResult(next, b.adjacentBombs(next.getX(), next.getY()));
             }
 
+            if (!won) System.out.println(pos);
             assertTrue(won);
 
             Set<Position> expectedBombs = new HashSet<>(
@@ -202,6 +202,203 @@ public class MSAgentTest {
             assertTrue(expectedBombs.contains(agent.markBomb()));
             assertTrue(expectedBombs.contains(agent.markBomb()));
             assertTrue(expectedBombs.contains(agent.markBomb()));
+            assertEquals(null, agent.markBomb());
+        }
+    }
+
+    @Test
+    public void disjointConstraintTest() {
+        /*
+        X200002X
+        x200002X
+        11000011
+        00000000
+        00000000
+        11000011
+        X200002X
+        X200002X
+        */
+
+        Board b = new Board(8,8);
+        b.addBomb(0,0); b.addBomb(0,1);
+        b.addBomb(7,0); b.addBomb(7,1);
+        b.addBomb(0,6); b.addBomb(0,7);
+        b.addBomb(7,6); b.addBomb(7,7);
+
+        Set<Position> uniqueMoveCounter = new HashSet<>();
+        uniqueMoveCounter.add(this.grid.getVariable(4,4));
+
+        MSAgent a = new MSAgent(8,8,8, this.grid.getVariable(4,4));
+        a.sendBackResult(a.nextMove(), 0);
+        int movesToWin = 8 * 8 - 8 - 1;
+        boolean win = true;
+        while (movesToWin-- > 0) {
+            Position p = a.nextMove();
+            uniqueMoveCounter.add(p);
+            if (b.containsBomb(p.getX(), p.getY())) {
+                win = false;
+                break;
+            }
+            a.sendBackResult(p, b.adjacentBombs(p.getX(), p.getY()));
+        }
+
+        assertTrue(win);
+        Set<Position> expectedBombSet = new HashSet<>(
+                Arrays.asList(
+                        this.grid.getVariable(0,0),
+                        this.grid.getVariable(0,1),
+                        this.grid.getVariable(7,0),
+                        this.grid.getVariable(7,1),
+                        this.grid.getVariable(0,6),
+                        this.grid.getVariable(0,7),
+                        this.grid.getVariable(7,6),
+                        this.grid.getVariable(7,7)
+                )
+        );
+        for (int i = 0; i < 8; i++) assertTrue(expectedBombSet.contains(a.markBomb()));
+        assertEquals(null, a.markBomb());
+
+        assertEquals(8*8-8, uniqueMoveCounter.size());
+
+    }
+
+    @Test
+    public void noGuessNeededGame() {
+        /*
+         01234567
+        0##X###X#
+        1#####X##
+        2#######X
+        3###X####
+        4X######X
+        5########
+        6X###XX##
+        7########
+         */
+
+        Board b = new Board(8,8);
+        Set<Position> bombs = new HashSet<>(Arrays.asList(
+                this.grid.getVariable(2,0),
+                this.grid.getVariable(6,0),
+                this.grid.getVariable(5,1),
+                this.grid.getVariable(7,2),
+                this.grid.getVariable(3,3),
+                this.grid.getVariable(0,4),
+                this.grid.getVariable(7,4),
+                this.grid.getVariable(0,6),
+                this.grid.getVariable(4,6),
+                this.grid.getVariable(5,6)
+        ));
+        for (Position pos : bombs){
+           b.addBomb(pos.getX(), pos.getY());
+        }
+
+        for (int n = 0; n < 50; n++) {
+            MSAgent agent = new MSAgent(8, 8, 10, this.grid.getVariable(0, 0));
+            int toWin = 8 * 8 - 10;
+            boolean win = true;
+            while (toWin-- > 0) {
+                Position next = agent.nextMove();
+                if (b.containsBomb(next.getX(), next.getY())) {
+                    win = false;
+                    break;
+                }
+                agent.sendBackResult(next, b.adjacentBombs(next.getX(), next.getY()));
+            }
+
+            assertTrue(win);
+            for (int i = 0; i < 10; i++) {
+                assertTrue(bombs.contains(agent.markBomb()));
+            }
+            assertEquals(null, agent.markBomb());
+        }
+    }
+
+    @Test
+    public void noGuessNeededGame2() {
+        /*
+         0123456789012345
+        0#####x#x########
+        1###X#x#x###xx###
+        2#############x##
+        3###x######x#x#x#
+        4###x##xx#####x#x
+        5##x####x##x#####
+        6#####x##########
+        7###########x###x
+        8###x############
+        9########x####x##
+        0x##x#######xxx##
+        1#x#x#########x##
+        2#############xx#
+        3###x############
+        4############x###
+        5#####x#####x####
+         */
+        Board b = new Board(16, 16);
+        Set<Position> bombs = new HashSet<>(Arrays.asList(
+                this.grid.getVariable(5,0),
+                this.grid.getVariable(7,0),
+                this.grid.getVariable(3,1),
+                this.grid.getVariable(5,1),
+                this.grid.getVariable(7,1),
+                this.grid.getVariable(11,1),
+                this.grid.getVariable(12,1),
+                this.grid.getVariable(13,1),
+                this.grid.getVariable(3,3),
+                this.grid.getVariable(10,3),
+                this.grid.getVariable(12,3),
+                this.grid.getVariable(14,3),
+                this.grid.getVariable(3,4),
+                this.grid.getVariable(6,4),
+                this.grid.getVariable(7,4),
+                this.grid.getVariable(13,4),
+                this.grid.getVariable(15,4),
+                this.grid.getVariable(2,5),
+                this.grid.getVariable(7,5),
+                this.grid.getVariable(10,5),
+                this.grid.getVariable(5,6),
+                this.grid.getVariable(11,7),
+                this.grid.getVariable(15,7),
+                this.grid.getVariable(3,8),
+                this.grid.getVariable(8,9),
+                this.grid.getVariable(13,9),
+                this.grid.getVariable(0,10),
+                this.grid.getVariable(3,10),
+                this.grid.getVariable(11,10),
+                this.grid.getVariable(12,10),
+                this.grid.getVariable(13,10),
+                this.grid.getVariable(1,11),
+                this.grid.getVariable(3,11),
+                this.grid.getVariable(13,11),
+                this.grid.getVariable(13,12),
+                this.grid.getVariable(14,12),
+                this.grid.getVariable(3,13),
+                this.grid.getVariable(12,14),
+                this.grid.getVariable(5,15),
+                this.grid.getVariable(11,15)
+        ));
+        for (Position pos : bombs){
+            b.addBomb(pos.getX(), pos.getY());
+        }
+
+        for (int n = 0; n < 50; n++) {
+            MSAgent agent = new MSAgent(16, 16, 40, this.grid.getVariable(0, 0));
+            int toWin = 16 * 16 - 40;
+            boolean win = true;
+            while (toWin-- > 0) {
+                Position next = agent.nextMove();
+                if (b.containsBomb(next.getX(), next.getY())) {
+                    win = false;
+                    break;
+                }
+                agent.sendBackResult(next, b.adjacentBombs(next.getX(), next.getY()));
+            }
+
+            assertTrue(win);
+            for (int i = 0; i < 40; i++) {
+                assertTrue(bombs.contains(agent.markBomb()));
+            }
             assertEquals(null, agent.markBomb());
         }
     }
