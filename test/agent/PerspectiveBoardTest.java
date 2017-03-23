@@ -371,13 +371,4 @@ public class PerspectiveBoardTest {
         assertEquals(expectedVars, i.getUnknownNeighbours());
         assertEquals(1, i.getAdjacentBombs());
     }
-
-    void p(byte[][] b) {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                System.out.print(b[j][i]+ " ");
-            }
-            System.out.println();
-        }
-    }
 }

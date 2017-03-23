@@ -144,14 +144,13 @@ public class MSAgent {
     }
 
     /**
-     * Adds the first move to the pending moves.
+     * Adds the first move to the pending moves. It avoids edges.
      */
     private void firstMove() {
-        // TODO: is there something better to do? avoid edges? avoid corners? run simulations...
         this.pendingMoves.add(
                 this.grid.getVariable(
-                        this.generator.nextInt(this.width),
-                        this.generator.nextInt(this.height)
+                        1 + this.generator.nextInt(this.width - 2),
+                        1 + this.generator.nextInt(this.height - 2)
                 )
         );
     }
@@ -174,12 +173,13 @@ public class MSAgent {
         for (Map.Entry<Set<ConstraintInfo>, Set<Position>> entry : cGroups.getGroups().entrySet()) {
             found = searchGroup(entry, bombs);
         }
+        boolean searchAgain = !found && !bombs.isEmpty();
         while (!bombs.isEmpty()) {
             Position position = bombs.pop();
-            this.board.setBombAt(position.getX(), position.getY(), this.grid, this.pendingMoves, this.unmarkedBombs); // TODO: call empty temp set if !found, add pending.isempty to search again condition
+            this.board.manualSetBombAt(position.getX(), position.getY(), this.grid, this.pendingMoves, this.unmarkedBombs);
         }
         // If only known bombs are found, we search again since some might result in a newly found 'known-no-bomb'
-        return (!found && !bombs.isEmpty()) ? search() : found;
+        return searchAgain ? search() : found;
     }
 
     /**
@@ -210,10 +210,10 @@ public class MSAgent {
      * Adds the most likely non-bomb to the pending moves.
      */
     private void guess() {
-        Map<Position, Double> probabilities = new HashMap<>();          // Probability map for variables
-        Set<Position> variables = new HashSet<>();                      // Collects all variables in all groups
-        ConstraintGroups cGroups = new ConstraintGroups(this.board);    // Constraint groups
-        int bombsOutsideVariables = this.bombs;                         // Bomb counter for squares outside variables
+        Map<Position, Double> probabilities = new HashMap<>();                  // Probability map for variables
+        Set<Position> variables = new HashSet<>();                              // Collects all variables in all groups
+        ConstraintGroups cGroups = new ConstraintGroups(this.board);            // Constraint groups
+        int bombsOutsideVariables = this.bombs - this.unmarkedBombsCounter();   // Bomb counter for squares outside variables
 
         // Get probability for each group of variables
         for (Map.Entry<Set<ConstraintInfo>, Set<Position>> entry : cGroups.getGroups().entrySet()) {
@@ -226,13 +226,12 @@ public class MSAgent {
             }
         }
 
-        // todo: subtract stored bombs from bombsoutside
-
         // Sorting
         PriorityQueue<Map.Entry<Position, Double>> pq = new PriorityQueue<>(Comparator.comparingDouble(Map.Entry::getValue));
         for (Map.Entry<Position, Double> entry : probabilities.entrySet()) {
             pq.add(entry);
         }
+
 
         // All unknown non variables
         ArrayList<Position> unknownNonVariables = getUnknownNonVariables(variables);
@@ -310,5 +309,18 @@ public class MSAgent {
             }
         }
         return unknownNonVars;
+    }
+
+    /**
+     * Counts number of unmarked bombs
+     *
+     * @return number of unmarked bombs
+     */
+    private int unmarkedBombsCounter() {
+        int counter = 0;
+        for (Position position : this.unmarkedBombs) {
+            if (!this.markedBombs.contains(position)) counter++;
+        }
+        return counter;
     }
 }

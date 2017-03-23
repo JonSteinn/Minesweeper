@@ -242,6 +242,6 @@ public class MSModelTest {
     }
 
     private void add(Set<Position> set, Position... positions) {
-        for (Position p : positions) set.add(p);
+        Collections.addAll(set, positions);
     }
 }

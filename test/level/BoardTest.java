@@ -3,11 +3,6 @@ package level;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import static org.junit.Assert.*;
 
 /**
@@ -15,13 +10,11 @@ import static org.junit.Assert.*;
  */
 public class BoardTest {
 
-    private Random random;
     private Board board;
 
     @Before
     public void setUp() throws Exception {
         this.board = new Board(8,5);
-        this.random = new Random();
     }
 
     @Test

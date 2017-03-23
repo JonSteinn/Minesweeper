@@ -28,7 +28,7 @@ public class RandomBoardGenerator {
      * @param bombs number of bombs to be included in the board
      * @param noSurrounded true => no bomb is surrounded only by bombs
      * @param spreadEven true => recursively: split board and generate in parts
-     * @return
+     * @return Board that is generated
      */
     public Board create(int width, int height, int bombs, boolean noSurrounded, boolean spreadEven) {
         return (noSurrounded && spreadEven) ?

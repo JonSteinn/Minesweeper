@@ -25,7 +25,7 @@ public class ProbabilityModel {
      * @param info constraint group
      * @param variables all variables in the constraint group
      * @param varCollection a collection to store any variable for outside use
-     * @throws ContradictionException
+     * @throws ContradictionException should never happen
      */
     public ProbabilityModel(Set<ConstraintInfo> info, Set<Position> variables, Set<Position> varCollection) throws ContradictionException {
         this.model = new Model();
@@ -74,7 +74,6 @@ public class ProbabilityModel {
             }
             if (minBombs > bombsThisSolution) minBombs = bombsThisSolution;
         }
-
         // Convert counter to probabilities.
         long totalSolutions = this.model.getSolver().getSolutionCount();
         for (Position position : this.varMap.keySet()) {

@@ -25,7 +25,7 @@ public class MSModel {
      *
      * @param constraints Constraints in a constraint group
      * @param variables Variables in a constraint group
-     * @throws ContradictionException
+     * @throws ContradictionException should never happen
      */
     public MSModel(Set<ConstraintInfo> constraints, Set<Position> variables) throws ContradictionException {
         this.model = new Model();

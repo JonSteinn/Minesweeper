@@ -195,9 +195,9 @@ public class Controller {
     /**
      * Click for computer. Not a UI event.
      *
-     * @param x
-     * @param y
-     * @return
+     * @param x coordinate
+     * @param y coordinate
+     * @return adjacent number in actual board for (x,y)
      */
     private int computerClick(int x, int y) {
         MinesweeperButton button = this.boardButtons.get(x, y);

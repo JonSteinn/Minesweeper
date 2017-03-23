@@ -49,7 +49,7 @@ public class PerspectiveBoard {
      * @param moves the set of pending moves for the agent
      * @param bombs a set of position for the agent to mark on GUI
      */
-    public void setBombAt(int x, int y, PositionGrid grid, Set<Position> moves, Set<Position> bombs) { // todo: add outside call boolean which on true calls emptyallsets
+    public void setBombAt(int x, int y, PositionGrid grid, Set<Position> moves, Set<Position> bombs) {
         board[x][y] = BOMB;
         bombs.add(grid.getVariable(x,y));
         for (Position position : grid.getNeighbours(x,y)) {
@@ -60,6 +60,20 @@ public class PerspectiveBoard {
                 storeSimplifications(info, position, moves);
             }
         }
+    }
+
+    /**
+     * Same as setBombAt but empties temp sets when done.
+     *
+     * @param x coordinate
+     * @param y coordinate
+     * @param grid pre-allocated memory for all possible positions
+     * @param moves the set of pending moves for the agent
+     * @param bombs a set of position for the agent to mark on GUI
+     */
+    public void manualSetBombAt(int x, int y, PositionGrid grid, Set<Position> moves, Set<Position> bombs) {
+        setBombAt(x, y, grid, moves, bombs);
+        emptyTempSets(grid, moves, bombs);
     }
 
     /**
@@ -123,9 +137,9 @@ public class PerspectiveBoard {
      * When we are done updating, we update our knowledge for all bombs we discovered. We do not
      * update the non-bombs since they will be updated when we pop them from the pending moves.
      *
-     * @param grid
-     * @param moves
-     * @param bombs
+     * @param grid allocated ememory for positions
+     * @param moves pending moves
+     * @param bombs unmarked bombs
      */
     private void emptyTempSets(PositionGrid grid, Set<Position> moves, Set<Position> bombs) {
         while (!containsBombSet.isEmpty()) {
