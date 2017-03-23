@@ -210,6 +210,7 @@ public class MSAgent {
      * Adds the most likely non-bomb to the pending moves.
      */
     private void guess() {
+        if (!this.pendingMoves.isEmpty()) return;
         Map<Position, Double> probabilities = new HashMap<>();                  // Probability map for variables
         Set<Position> variables = new HashSet<>();                              // Collects all variables in all groups
         ConstraintGroups cGroups = new ConstraintGroups(this.board);            // Constraint groups

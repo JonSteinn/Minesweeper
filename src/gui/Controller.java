@@ -151,14 +151,14 @@ public class Controller {
             int adj = this.board.adjacentBombs(x, y);
             if (adj == 0) {
                 // Recursive auto update for 0-squares
-                if (!board.outOfBounds(x - 1, y - 1)) this.boardButtons.get(x - 1, y - 1).fire();
-                if (!board.outOfBounds(x, y - 1)) this.boardButtons.get(x, y - 1).fire();
-                if (!board.outOfBounds(x + 1, y - 1)) this.boardButtons.get(x + 1, y - 1).fire();
-                if (!board.outOfBounds(x - 1, y)) this.boardButtons.get(x - 1, y).fire();
-                if (!board.outOfBounds(x + 1, y)) this.boardButtons.get(x + 1, y).fire();
-                if (!board.outOfBounds(x - 1, y + 1)) this.boardButtons.get(x - 1, y + 1).fire();
-                if (!board.outOfBounds(x, y + 1)) this.boardButtons.get(x, y + 1).fire();
-                if (!board.outOfBounds(x + 1, y + 1)) this.boardButtons.get(x + 1, y + 1).fire();
+                if (board.outOfBounds(x - 1, y - 1)) this.boardButtons.get(x - 1, y - 1).fire();
+                if (board.outOfBounds(x, y - 1)) this.boardButtons.get(x, y - 1).fire();
+                if (board.outOfBounds(x + 1, y - 1)) this.boardButtons.get(x + 1, y - 1).fire();
+                if (board.outOfBounds(x - 1, y)) this.boardButtons.get(x - 1, y).fire();
+                if (board.outOfBounds(x + 1, y)) this.boardButtons.get(x + 1, y).fire();
+                if (board.outOfBounds(x - 1, y + 1)) this.boardButtons.get(x - 1, y + 1).fire();
+                if (board.outOfBounds(x, y + 1)) this.boardButtons.get(x, y + 1).fire();
+                if (board.outOfBounds(x + 1, y + 1)) this.boardButtons.get(x + 1, y + 1).fire();
             } else {
                 button.setText(Integer.toString(adj));
             }

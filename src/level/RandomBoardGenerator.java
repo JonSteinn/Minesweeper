@@ -180,7 +180,7 @@ public class RandomBoardGenerator {
     private boolean surrounded(Board board, int x, int y) {
         for (int i = x - 1; i < x + 2; i++) {
             for (int j = y - 1; j < y + 2; j++) {
-                if (!board.outOfBounds(i,j) && !board.containsBomb(i,j)) {
+                if (board.outOfBounds(i,j) && !board.containsBomb(i,j)) {
                     return false;
                 }
             }

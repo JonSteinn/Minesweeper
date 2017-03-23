@@ -56,7 +56,7 @@ public class Board {
      * @return true iff (x,y) is outside the board
      */
     public boolean outOfBounds(int x, int y) {
-        return x < 0 || y < 0 || x >= this.getWidth() || y >= this.getHeight();
+        return x >= 0 && y >= 0 && x < this.getWidth() && y < this.getHeight();
     }
 
     /**
@@ -81,7 +81,7 @@ public class Board {
         int counter = 0;
         for (int i = x-1; i < x+2; i++) {
             for (int j = y-1; j < y+2; j++) {
-                if (!outOfBounds(i, j) && containsBomb(i,j)) {
+                if (outOfBounds(i, j) && containsBomb(i,j)) {
                     counter++;
                 }
             }
