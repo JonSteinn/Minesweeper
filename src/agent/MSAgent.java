@@ -6,9 +6,12 @@ import java.util.*;
 
 /**
  * Created by Jonni on 3/20/2017.
+ *
+ * The Minesweeper playing agent.
  */
 public class MSAgent {
 
+    /* Temporary storage */
     private Set<Position> markedBombs;
     private Set<Position> unmarkedBombs;
     private Set<Position> history;
@@ -23,30 +26,40 @@ public class MSAgent {
     private int bombs;
     private int nonBombs;
 
+    // TODO: switch to end-game mode at some point
+
+    /**
+     * Constructor for an agent with a random first move.
+     *
+     * @param width row size of actual board
+     * @param height column size of actual board
+     * @param bombs number of bombs in the actual board
+     */
     public MSAgent(int width, int height, int bombs) {
         this.init(width, height, bombs);
         this.firstMove();
     }
 
+    /**
+     * Constructor for an agent with first move as parameter. This is
+     * mainly for testing.
+     *
+     * @param width row size of actual board
+     * @param height column size of actual board
+     * @param bombs number of bombs in the actual board
+     * @param first the first move for the player
+     */
     public MSAgent(int width, int height, int bombs, Position first) {
         this.init(width, height, bombs);
         this.pendingMoves.add(first);
     }
 
-    public void init(int width, int height, int bombs) {
-        this.markedBombs = new HashSet<>();
-        this.unmarkedBombs = new HashSet<>();
-        this.history = new HashSet<>();
-        this.generator = new Random();
-        this.pendingMoves = new HashSet<>();
-        this.board = new PerspectiveBoard(width, height);
-        this.grid = new PositionGrid(width, height);
-        this.width = width;
-        this.height = height;
-        this.bombs = bombs;
-        this.nonBombs = width * height - bombs;
-    }
-
+    /**
+     * Called by the GUI controller each turn until this returns null. Any
+     * position passed to the controller will be marked.
+     *
+     * @return position to mark on GUI, null if none exist
+     */
     public Position markBomb() {
         Position returnValue = null;
         while (!this.unmarkedBombs.isEmpty()) {
@@ -61,40 +74,101 @@ public class MSAgent {
         return returnValue;
     }
 
+    /**
+     * Called by the GUI controller each turn.
+     *
+     * @return the next move from the agent.
+     */
     public Position nextMove() {
         Position next = null;
-        while (!pendingMoves.isEmpty()) {
+
+        // Are there any moves bending?
+        while (!this.pendingMoves.isEmpty()) {
             Position nextMove = nextPending();
-            if (!history.contains(nextMove)) {
+            if (!this.history.contains(nextMove)) {
                 next = nextMove;
-                history.add(nextMove);
+                this.history.add(nextMove);
                 break;
             }
         }
+
+        // If not, search for one
         if (next == null) {
             findMove();
-            next = pendingMoves.isEmpty() ? randomMove() : nextPending();
-            history.add(next);
+            next = this.pendingMoves.isEmpty() ? randomMove() : nextPending();
+            this.history.add(next);
         }
+
         this.nonBombs--;
         return next;
     }
 
+    /**
+     * This is called by the GUI controller to pass back the adjacent number
+     * for the square clicked by the agent. This is the only communication
+     * from the GUI to the agent.
+     *
+     * @param position position of adjacent number
+     * @param adjacent adjacent number in actual board
+     */
     public void sendBackResult(Position position, int adjacent) {
-        this.board.setAdjacent(position.getX(), position.getY(), adjacent, grid, pendingMoves, this.unmarkedBombs);
+        this.board.setAdjacent(
+                position.getX(),
+                position.getY(),
+                adjacent,
+                this.grid,
+                this.pendingMoves,
+                this.unmarkedBombs
+        );
     }
 
-    // TODO: is there something better to do?
+    /**
+     * Initializes data structures and counters.
+     *
+     * @param width row size of actual board
+     * @param height column size of actual board
+     * @param bombs number of bombs in the actual board
+     */
+    private void init(int width, int height, int bombs) {
+        this.markedBombs = new HashSet<>();
+        this.unmarkedBombs = new HashSet<>();
+        this.history = new HashSet<>();
+        this.generator = new Random();
+        this.pendingMoves = new HashSet<>();
+        this.board = new PerspectiveBoard(width, height);
+        this.grid = new PositionGrid(width, height);
+        this.width = width;
+        this.height = height;
+        this.bombs = bombs;
+        this.nonBombs = width * height - bombs;
+    }
+
+    /**
+     * Adds the first move to the pending moves.
+     */
     private void firstMove() {
-        pendingMoves.add(grid.getVariable(generator.nextInt(width), generator.nextInt(height)));
+        // TODO: is there something better to do? avoid edges? avoid corners? run simulations...
+        this.pendingMoves.add(
+                this.grid.getVariable(
+                        this.generator.nextInt(this.width),
+                        this.generator.nextInt(this.height)
+                )
+        );
     }
 
+    /**
+     * Search moves if non pending.
+     */
     private void findMove() {
         if (!search()) guess();
     }
 
+    /**
+     * @return true if a move was found (that is, some square that must not contain a bombs)
+     */
     private boolean search() {
         boolean found = false;
+        // Any found bombs are set after the search
         Stack<Position> bombs = new Stack<>();
         ConstraintGroups cGroups = new ConstraintGroups(this.board);
         for (Map.Entry<Set<ConstraintInfo>, Set<Position>> entry : cGroups.getGroups().entrySet()) {
@@ -102,11 +176,19 @@ public class MSAgent {
         }
         while (!bombs.isEmpty()) {
             Position position = bombs.pop();
-            this.board.setBombAt(position.getX(), position.getY(), this.grid, this.pendingMoves, this.unmarkedBombs);
+            this.board.setBombAt(position.getX(), position.getY(), this.grid, this.pendingMoves, this.unmarkedBombs); // TODO: call empty temp set if !found, add pending.isempty to search again condition
         }
+        // If only known bombs are found, we search again since some might result in a newly found 'known-no-bomb'
         return (!found && !bombs.isEmpty()) ? search() : found;
     }
 
+    /**
+     * Searches for guarantees in a constraint group.
+     *
+     * @param entry a tuple of constraint group and all of its variables
+     * @param bombs a collection of bombs which stores any found bombs
+     * @return true iff a non-bomb square is found
+     */
     private boolean searchGroup(Map.Entry<Set<ConstraintInfo>, Set<Position>> entry, Stack<Position> bombs) {
         boolean found = false;
         try {
@@ -124,26 +206,42 @@ public class MSAgent {
         return found;
     }
 
+    /**
+     * Adds the most likely non-bomb to the pending moves.
+     */
     private void guess() {
-        Set<Position> variables = new HashSet<>();
-        Map<Position, Double> probabilities = new HashMap<>();
-        ConstraintGroups cGroups = new ConstraintGroups(this.board);
-        int bombsOutsideVariables = this.bombs;
+        Map<Position, Double> probabilities = new HashMap<>();          // Probability map for variables
+        Set<Position> variables = new HashSet<>();                      // Collects all variables in all groups
+        ConstraintGroups cGroups = new ConstraintGroups(this.board);    // Constraint groups
+        int bombsOutsideVariables = this.bombs;                         // Bomb counter for squares outside variables
+
+        // Get probability for each group of variables
         for (Map.Entry<Set<ConstraintInfo>, Set<Position>> entry : cGroups.getGroups().entrySet()) {
             try {
                 ProbabilityModel pModel = new ProbabilityModel(entry.getKey(), entry.getValue(), variables);
+                // Subtract the minimum amount of bombs a solution can have from the bomb counter for non-variables
                 bombsOutsideVariables -= pModel.getProbabilities(probabilities);
             } catch (ContradictionException e) {
                 System.out.println("Something wrong with the csp model!");
             }
         }
 
+        // todo: subtract stored bombs from bombsoutside
+
+        // Sorting
         PriorityQueue<Map.Entry<Position, Double>> pq = new PriorityQueue<>(Comparator.comparingDouble(Map.Entry::getValue));
         for (Map.Entry<Position, Double> entry : probabilities.entrySet()) {
             pq.add(entry);
         }
 
+        // All unknown non variables
         ArrayList<Position> unknownNonVariables = getUnknownNonVariables(variables);
+
+        // Cases:
+        // 1: No variables, we add a random from unknown
+        // 2: No unknown, we add the least likely bomb from the probability map
+        // 3: Neither empty, we add the least likely out of [least likely variable, random unknown non-variable]
+
         if (pq.isEmpty()) {
             this.pendingMoves.add(unknownNonVariables.get(this.generator.nextInt(unknownNonVariables.size())));
         } else if (unknownNonVariables.isEmpty()) {
@@ -157,6 +255,11 @@ public class MSAgent {
         }
     }
 
+    /**
+     * Pop mechanism for a set.
+     *
+     * @return some unmarked bomb
+     */
     private Position nextBomb() {
         Iterator<Position> it = this.unmarkedBombs.iterator();
         Position bomb = it.next();
@@ -164,6 +267,11 @@ public class MSAgent {
         return bomb;
     }
 
+    /**
+     * Pop mechanism for a set.
+     *
+     * @return some pending move
+     */
     private Position nextPending() {
         Iterator<Position> it = pendingMoves.iterator();
         Position pos = it.next();
@@ -171,6 +279,9 @@ public class MSAgent {
         return pos;
     }
 
+    /**
+     * @return random move from any unknown position
+     */
     private Position randomMove() {
         ArrayList<Position> list = new ArrayList<>();
         for (int i = 0; i < width; i++) {
@@ -181,6 +292,10 @@ public class MSAgent {
         return list.get(this.generator.nextInt(list.size()));
     }
 
+    /**
+     * @param variables the known variables
+     * @return the unknown non variables as a list
+     */
     public ArrayList<Position> getUnknownNonVariables(Set<Position> variables) {
         ArrayList<Position> unknownNonVars = new ArrayList<>();
         for (int i = 0; i < this.width; i++) {

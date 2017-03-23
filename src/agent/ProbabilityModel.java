@@ -11,13 +11,22 @@ import java.util.Set;
 
 /**
  * Created by Jonni on 3/22/2017.
+ *
+ * Sets up a Choco constraint model to find probability of variables.
  */
 public class ProbabilityModel {
 
     private Model model;
     private Map<Position, IntVar> varMap;
-    private Map<IntVar, Position> posMap;
 
+    /**
+     * Set up Choco model for the constraint group.
+     *
+     * @param info constraint group
+     * @param variables all variables in the constraint group
+     * @param varCollection a collection to store any variable for outside use
+     * @throws ContradictionException
+     */
     public ProbabilityModel(Set<ConstraintInfo> info, Set<Position> variables, Set<Position> varCollection) throws ContradictionException {
         this.model = new Model();
         this.varMap = new HashMap<>();
@@ -38,25 +47,38 @@ public class ProbabilityModel {
         this.model.getSolver().propagate();
     }
 
-    public int getProbabilities(Map<Position, Double> pMap) {
+    /**
+     * Updates a map for probabilities for all variables in a constraint group.
+     *
+     * @param probabilityMap a map to update
+     * @return minimum number of bombs for the constraint group
+     */
+    public int getProbabilities(Map<Position, Double> probabilityMap) {
         int minBombs = Integer.MAX_VALUE;
-        for (Position position : this.varMap.keySet()) pMap.put(position, 0.0);
 
+        // Initialize all probabilities as 0.0
+        for (Position position : this.varMap.keySet()) probabilityMap.put(position, 0.0);
+
+        // For a solution in the group of all solutions for the constraint group
         for (Solution solution : this.model.getSolver().findAllSolutions()) {
             int bombsThisSolution = 0;
             for (Position position : this.varMap.keySet()) {
                 int value = solution.getIntVal(this.varMap.get(position));
+                // If the position contains a bomb in this solution,
+                // we add one to the probability map
+                // The map works as a counter at this point.
                 if (value == 1) {
-                    pMap.put(position, pMap.get(position) + 1);
+                    probabilityMap.put(position, probabilityMap.get(position) + 1);
                     bombsThisSolution++;
                 }
             }
             if (minBombs > bombsThisSolution) minBombs = bombsThisSolution;
         }
 
+        // Convert counter to probabilities.
         long totalSolutions = this.model.getSolver().getSolutionCount();
         for (Position position : this.varMap.keySet()) {
-            pMap.put(position, 100.0 * pMap.get(position) / totalSolutions);
+            probabilityMap.put(position, 100.0 * probabilityMap.get(position) / totalSolutions);
         }
 
         return minBombs;
