@@ -76,6 +76,7 @@ public class MSAgent {
             next = pendingMoves.isEmpty() ? randomMove() : nextPending();
             history.add(next);
         }
+        this.nonBombs--;
         return next;
     }
 
@@ -136,6 +137,7 @@ public class MSAgent {
                 System.out.println("Something wrong with the csp model!");
             }
         }
+
         PriorityQueue<Map.Entry<Position, Double>> pq = new PriorityQueue<>(Comparator.comparingDouble(Map.Entry::getValue));
         for (Map.Entry<Position, Double> entry : probabilities.entrySet()) {
             pq.add(entry);
@@ -183,8 +185,11 @@ public class MSAgent {
         ArrayList<Position> unknownNonVars = new ArrayList<>();
         for (int i = 0; i < this.width; i++) {
             for (int j = 0; j < this.height; j++) {
-                if (this.board.getBoard()[i][j] == PerspectiveBoard.UNKNOWN &&
-                        !variables.contains(this.grid.getVariable(i, j))) {
+                if (
+                        this.board.getBoard()[i][j] == PerspectiveBoard.UNKNOWN &&
+                        !variables.contains(this.grid.getVariable(i, j)) &&
+                        !this.unmarkedBombs.contains(this.grid.getVariable(i, j))
+                ) {
                     unknownNonVars.add(this.grid.getVariable(i, j));
                 }
             }
