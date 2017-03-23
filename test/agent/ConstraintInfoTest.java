@@ -41,6 +41,7 @@ public class ConstraintInfoTest {
         set.add(this.grid.getVariable(0,0));
         set.add(this.grid.getVariable(0,1));
         ConstraintInfo info = new ConstraintInfo(set, 2);
+        System.out.println(info);
         assertEquals(2, info.getAdjacentBombs());
         info.decrementAdjacentBombs();
         assertEquals(1, info.getAdjacentBombs());

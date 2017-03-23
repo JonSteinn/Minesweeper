@@ -12,20 +12,30 @@ import java.util.Set;
 
 /**
  * Created by Jonni on 3/20/2017.
+ *
+ * A CSP  model.
  */
 public class MSModel {
 
     private Model model;
     private Map<Position, IntVar> varMap;
 
-    public MSModel(Set<ConstraintInfo> info, Set<Position> variables) throws ContradictionException {
+    /**
+     * Creates a Choco model using the constraint in a given constraint group.
+     *
+     * @param constraints Constraints in a constraint group
+     * @param variables Variables in a constraint group
+     * @throws ContradictionException
+     */
+    public MSModel(Set<ConstraintInfo> constraints, Set<Position> variables) throws ContradictionException {
         this.model = new Model();
         this.varMap = new HashMap<>();
 
-        for (Position pos : variables) {
-            this.varMap.put(pos, this.model.intVar(pos.toString(), 0, 1));
-        }
-        for (ConstraintInfo c : info) {
+        // Map each variable to a Choco variable
+        for (Position pos : variables) this.varMap.put(pos, this.model.intVar(pos.toString(), 0, 1));
+
+        // Create Choco constraints from our constraints
+        for (ConstraintInfo c : constraints) {
             IntVar[] con = new IntVar[c.getUnknownNeighbours().size()];
             int index = 0;
             for (Position pos : c.getUnknownNeighbours()) {
@@ -34,24 +44,45 @@ public class MSModel {
             }
             this.model.sum(con, "=", c.getAdjacentBombs()).post();
         }
+
+        // constraint propagation
         this.model.getSolver().propagate();
     }
 
-
-    public boolean hasBomb(Position p) {
-        return containsContradiction(model.arithm(varMap.get(p), "=", 0));
+    /**
+     * Assume that a position does not contain a bomb, check if it
+     * leads to a contradiction. If so, it must contain a bomb.
+     *
+     * @param position Variable
+     * @return true if we can guarantee that it contains a bomb.
+     */
+    public boolean hasBomb(Position position) {
+        return containsContradiction(model.arithm(varMap.get(position), "=", 0));
     }
 
-    public boolean hasNoBombs(Position p) {
-        return containsContradiction(model.arithm(varMap.get(p), "=", 1));
+    /**
+     * Assume that a position contains a bomb, check if it
+     * leads to a contradiction. If so, it must not contain a bomb.
+     *
+     * @param position Variable
+     * @return true if we can guarantee that it contains no bomb.
+     */
+    public boolean hasNoBombs(Position position) {
+        return containsContradiction(model.arithm(varMap.get(position), "=", 1));
     }
 
-    private boolean containsContradiction(Constraint constraint) {
+    /**
+     * Use of Choco solver to see if we can find a solution given an assumption.
+     *
+     * @param assumption Constraint (Choco)
+     * @return true iff no solution is found
+     */
+    private boolean containsContradiction(Constraint assumption) {
         model.getEnvironment().worldPush();
-        model.post(constraint);
+        model.post(assumption);
         Solution sol = model.getSolver().findSolution();
         model.getEnvironment().worldPop();
-        model.unpost(constraint);
+        model.unpost(assumption);
         model.getSolver().hardReset();
         return sol == null;
     }
