@@ -22,7 +22,7 @@ public class Controller {
     public static Controller controller = new Controller();
 
     private Player player = Player.HUMAN;
-    private Difficulty difficulty = Difficulty.EASY;
+    private Size size = Size.SMALL;
     private Board board;
     private GameState state = GameState.IDLE;
     private RandomBoardGenerator boardGenerator;
@@ -39,7 +39,7 @@ public class Controller {
      */
     private Controller() {
         this.player = Player.HUMAN;
-        this.difficulty = Difficulty.EASY;
+        this.size = Size.SMALL;
         this.state = GameState.IDLE;
         this.boardGenerator = new RandomBoardGenerator();
         this.board = null;
@@ -69,8 +69,8 @@ public class Controller {
      */
     public void newGame() {
         this.state = GameState.IDLE;
-        switch (difficulty) {
-            case EASY:
+        switch (size) {
+            case SMALL:
                 this.board = this.boardGenerator.create(8, 8, 10, false, false);
                 this.footer.getBombsLeft().setAmountLeft(10);
                 this.clicksToWin = 8 * 8 - 10;
@@ -82,7 +82,7 @@ public class Controller {
                 this.clicksToWin = 16 * 16 - 40;
                 if (this.player == Player.Computer) this.agent = new MSAgent(16,16,40);
                 break;
-            case HARD:
+            case LARGE:
                 this.board = this.boardGenerator.create(24, 24, 99, false, false);
                 this.footer.getBombsLeft().setAmountLeft(99);
                 this.clicksToWin = 24 * 24 - 99;
@@ -107,12 +107,12 @@ public class Controller {
     }
 
     /**
-     * Changes difficulty.
+     * Changes size.
      *
-     * @param difficulty Difficulty enum
+     * @param size Size enum
      */
-    public void setDifficulty(Difficulty difficulty) {
-        this.difficulty = difficulty;
+    public void setSize(Size size) {
+        this.size = size;
         newGame();
         this.resizeStage();
     }

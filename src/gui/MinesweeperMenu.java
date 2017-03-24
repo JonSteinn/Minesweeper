@@ -35,12 +35,12 @@ public class MinesweeperMenu extends MenuBar {
         computer = new RadioMenuItem("Computer");
         computer .setOnAction(event -> Controller.controller.setPlayer(Player.Computer));
 
-        beginner = new RadioMenuItem("Easy");
-        beginner.setOnAction(event -> Controller.controller.setDifficulty(Difficulty.EASY));
+        beginner = new RadioMenuItem("Small");
+        beginner.setOnAction(event -> Controller.controller.setSize(Size.SMALL));
         intermediate = new RadioMenuItem("Medium");
-        intermediate.setOnAction(event -> Controller.controller.setDifficulty(Difficulty.MEDIUM));
-        expert = new RadioMenuItem("Hard");
-        expert.setOnAction(event -> Controller.controller.setDifficulty(Difficulty.HARD));
+        intermediate.setOnAction(event -> Controller.controller.setSize(Size.MEDIUM));
+        expert = new RadioMenuItem("Large");
+        expert.setOnAction(event -> Controller.controller.setSize(Size.LARGE));
 
         ToggleGroup play = new ToggleGroup();
         player.setToggleGroup(play);

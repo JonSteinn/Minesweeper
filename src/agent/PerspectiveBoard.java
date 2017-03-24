@@ -137,7 +137,7 @@ public class PerspectiveBoard {
      * When we are done updating, we update our knowledge for all bombs we discovered. We do not
      * update the non-bombs since they will be updated when we pop them from the pending moves.
      *
-     * @param grid allocated ememory for positions
+     * @param grid allocated memory for positions
      * @param moves pending moves
      * @param bombs unmarked bombs
      */

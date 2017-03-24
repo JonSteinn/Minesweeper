@@ -42,6 +42,22 @@ public class SimulationTest {
         }
     }
 
+    @Test
+    public void customTest() {
+        playManyGames(100, 50, 50, 400, false, false);
+    }
+
+    @Test
+    public void customTest2() {
+        playManyGames(1, 150, 150, 3800, false, false);
+    }
+
+    @Test
+    public void customTest3() {
+        // Takes time...
+        //playManyGames(1, 500, 500, 40000, false, false);
+    }
+
     private void easy(int games) {
         System.out.println("Easy");
         playManyGames(games, 10, 10, 8, false, false);
@@ -101,6 +117,7 @@ public class SimulationTest {
             agent.sendBackResult(next, board.adjacentBombs(next.getX(), next.getY()));
         }
 
+        System.out.println(movesToWin);
         return won ? 1 : 0;
     }
 }
